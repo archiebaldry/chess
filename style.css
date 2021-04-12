@@ -1,0 +1,27 @@
+body {
+	background-color: #515151;
+	margin: 5vmin;
+}
+img {
+	display: block;
+	width: 100%;
+}
+table {
+	border-spacing: 0;
+	cursor: pointer;
+	height: 90vmin;
+	margin: 0 auto;
+	width: 90vmin;
+}
+td {
+	background-color: #F0D9B5;
+	padding: 0;
+	text-align: center;
+	width: 12.5%;
+}
+td.dark {
+	background-color: #946f51;
+}
+tr {
+	height: 12.5%;
+}
