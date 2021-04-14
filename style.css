@@ -6,6 +6,9 @@ img {
 	display: block;
 	width: 100%;
 }
+h1 {
+	margin: 0;
+}
 p {
 	margin: 0;
 }
@@ -15,14 +18,26 @@ table {
 	margin: 0 auto;
 }
 td {
-	background-color: #F0D9B5;
+	background-color: #f0d9b5;
 	padding: 0;
 	text-align: center;
-	width: 12.5%;
+	width: 10vmin;
 }
 td.dark {
-	background-color: #946f51;
+	background-color: #b58863;
+}
+td.dark.selected {
+	background-color: #646f40;
+}
+td.selected {
+	background-color: #829769;
 }
 tr {
-	height: 32px;
+	height: 10vmin;
 }
+/* img.check {
+	filter: drop-shadow(0 0 8px red);
+}
+input[type=text] {
+	width: 320px;
+} */

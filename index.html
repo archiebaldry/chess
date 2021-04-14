@@ -6,6 +6,11 @@
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
+	<h1 id="ac" style="color:#ffffff;">White's move</h1>
+	<button onclick="nextMove()">Next Move</button>
+	<button onclick="flipBoard()">Flip Board</button>
+	<input type="checkbox" id="lockBoard">
+	<label for="lockBoard">Lock</label>
 	<table id="board">
 		<tr>
 			<td id="a8" onClick="clickedCell(this)"></td>
