@@ -1,17 +1,18 @@
 body {
 	background-color: #515151;
-	margin: 5vmin;
+	margin: 32px;
 }
 img {
 	display: block;
 	width: 100%;
 }
+p {
+	margin: 0;
+}
 table {
 	border-spacing: 0;
 	cursor: pointer;
-	height: 90vmin;
 	margin: 0 auto;
-	width: 90vmin;
 }
 td {
 	background-color: #F0D9B5;
@@ -23,5 +24,5 @@ td.dark {
 	background-color: #946f51;
 }
 tr {
-	height: 12.5%;
+	height: 32px;
 }

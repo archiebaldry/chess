@@ -20,7 +20,7 @@ function drawBoard() {
 		for (cell of row.cells) {
 			piece = board[index];
 			if (piece == "") {
-				cell.innerHTML = "";
+				cell.innerHTML = "<p>" + cell.id + "</p>";
 			}
 			else {
 				cell.innerHTML = "<img src='pieces/" + piece + ".svg'>";
