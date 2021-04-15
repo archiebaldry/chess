@@ -21,24 +21,105 @@ var selectedCell = "";
 
 drawBoard();
 
-function getPseudoMoves() {
-	for (row of board) {
-		for (cell of board) {
-			if (cell.charAt(0) == activeColour) {
-				console.log("TODO");
+function getPiecePseudoMoves(type, colour, x, y) {
+	// TODO: Promotion, en passant
+	moves = [];
+	otherColour = "b";
+	if (colour == "b") {
+		otherColour = "w";
+	}
+	if (type == "p") {
+		if (colour == "w") {
+			// Every move requires at least one free cell above
+			if (y == 0) {
+				return moves;
+			}
+			// Move: Push (up 1)
+			if (board[y - 1][x] == "") {
+				moves.push([x, y - 1, false]);
+			}
+			// Move: Double push (up 2, if on 2nd rank)
+			if (y == 6 && board[y - 1][x] == "" && board[y - 2][x] == "") {
+				moves.push([x, y - 2, false]);
+			}
+			// Capture: Left (up 1, left 1)
+			if (x != 0 && board[y - 1][x - 1].charAt(0) == "b") {
+				moves.push([x - 1, y - 1, true]);
+			}
+			// Capture: Right (up 1, right 1)
+			if (x != 7 && board[y - 1][x + 1].charAt(0) == "b") {
+				moves.push([x + 1, y - 1, true]);
+			}
+		}
+		else {
+			// Every move requires at least one free cell below
+			if (y == 7) {
+				return moves;
+			}
+			// Move: Push (down 1)
+			if (board[y + 1][x] == "") {
+				moves.push([x, y + 1, false]);
+			}
+			// Move: Double push (down 2, if on 7th rank)
+			if (y == 1 && board[y + 1][x] == "" && board[y + 2][x] == "") {
+				moves.push([x, y + 2, false]);
+			}
+			// Capture: Left (down 1, left 1)
+			if (x != 0 && board[y + 1][x - 1].charAt(0) == "w") {
+				moves.push([x - 1, y + 1, true]);
+			}
+			// Capture: Right (down 1, right 1)
+			if (x != 7 && board[y + 1][x + 1].charAt(0) == "w") {
+				moves.push([x + 1, y + 1, true]);
 			}
 		}
 	}
+	else if (type == "n") {
+		// Move/Capture: Top-left and top-right
+		if (y > 2) {
+			if (x != 0) {
+				if (board[y - 2][x - 1] == "") {
+					moves.push([x - 1, y - 2, false]);
+				}
+				else if (board[y - 2][x - 1].charAt(0) == otherColour) {
+					moves.push([x - 1, y - 2, true]);
+				}
+			}
+			if (x != 7) {
+				if (board[y - 2][x + 1] == "") {
+					moves.push([x + 1, y - 2, false]);
+				}
+				else if (board[y - 2][x + 1].charAt(0) == otherColour) {
+					moves.push([x + 1, y - 2, true]);
+				}
+			}
+		}
+		// Move/Capture: Bottom-left and bottom-right
+		if (y < 5) {
+			if (x != 0) {
+				if (board[y + 2][x - 1] == "") {
+					moves.push([x - 1, y + 2, false]);
+				}
+				else if (board[y + 2][x - 1].charAt(0) == otherColour) {
+					moves.push([x - 1, y + 2, true]);
+				}
+			}
+			if (x != 7) {
+				if (board[y + 2][x + 1] == "") {
+					moves.push([x + 1, y + 2, false]);
+				}
+				else if (board[y + 2][x + 1].charAt(0) == otherColour) {
+					moves.push([x + 1, y + 2, true]);
+				}
+			}
+		}
+	}
+	return moves;
 }
 
 function nextMove() {
 	// Clear highlighting (e.g. selected cell)
-	if (selectedCell != "") {
-		y = RANKS[selectedCell.charAt(1)];
-		x = FILES[selectedCell.charAt(0)];
-		BOARD.rows[y].cells[x].classList.remove("selected");
-		selectedCell = "";
-	}
+	clearSelectedCell();
 	// Update active colour
 	if (activeColour == "w") {
 		activeColour = "b";
@@ -80,39 +161,37 @@ function drawBoard() {
 
 function clearSelectedCell() {
 	if (selectedCell != "") {
-		console.log("Deselecting selected cell...");
-		x = FILES[selectedCell.charAt(0)];
-		y = RANKS[selectedCell.charAt(1)];
-		BOARD.rows[y].cells[x].classList.remove("selected");
+		selected_x = FILES[selectedCell.charAt(0)];
+		selected_y = RANKS[selectedCell.charAt(1)];
+		BOARD.rows[selected_y].cells[selected_x].classList.remove("selected");
 		selectedCell = "";
+		console.log("Cleared selected cell at", selected_x, selected_y);
 	}
 }
 
-function clickedCell(cell) {
+function onCellClicked(cell) {
 	console.clear();
 	
-	console.log("Selected pos: " + selectedCell);
-	console.log("Clicked pos: " + cell.id);
-	console.log("Clicked innerHTML: " + cell.innerHTML);
-	
+	// console.log("Selected pos: " + selectedCell);
+	// console.log("Clicked pos: " + cell.id);
+	// console.log("Clicked innerHTML: " + cell.innerHTML);
+
 	x = FILES[cell.id.charAt(0)];
 	y = RANKS[cell.id.charAt(1)];
 	piece = board[y][x];
-	
-	// Click the selected cell to deselect
-	if (cell.id == selectedCell) {
-		clearSelectedCell();
-	}
-	// If active colour's piece
-	else if (piece != "" && piece.charAt(0) == activeColour) {
-		clearSelectedCell();
-		console.log("Selecting clicked cell...");
+	previousCell = selectedCell;
+
+	clearSelectedCell();
+
+	// Piece exists, belongs to active colour and wasn't previously selected
+	if (piece != "" && piece.charAt(0) == activeColour && cell.id != previousCell) {
 		BOARD.rows[y].cells[x].classList.add("selected");
 		selectedCell = cell.id;
-	}
-	// Not active colour's piece
-	else {
-		clearSelectedCell();
+		console.log("Selected cell at", x, y);
+		moves = getPiecePseudoMoves(piece.charAt(1), piece.charAt(0), x, y);
+		for (move of moves) {
+			console.log(move);
+		}
 	}
 }
 

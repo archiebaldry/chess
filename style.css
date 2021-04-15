@@ -21,7 +21,7 @@ td {
 	background-color: #f0d9b5;
 	padding: 0;
 	text-align: center;
-	width: 10vmin;
+	width: 9vmin;
 }
 td.dark {
 	background-color: #b58863;
@@ -33,7 +33,7 @@ td.selected {
 	background-color: #829769;
 }
 tr {
-	height: 10vmin;
+	height: 9vmin;
 }
 /* img.check {
 	filter: drop-shadow(0 0 8px red);

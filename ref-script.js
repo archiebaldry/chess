@@ -139,6 +139,30 @@ function getKnightPseudoMoves(colour, x, y) {
 		if (pieces[m1x])
 		moves.push([0, m1x, m1y]);
 	}
+
+
+	// Move/Capture: Top-left and top-right
+	if (y > 2) {
+		if (x != 0) {
+			if (board[y - 2][x - 1] == "") {
+				moves.push([x - 1, y - 2, false]);
+			}
+			else if (board[y - 2][x - 1] == otherColour) {
+				moves.push([x - 1, y - 2, true]);
+			}
+		}
+		if (x != 7) {
+			if (board[y - 2][x + 1] == "") {
+				moves.push([x + 1, y - 2, false]);
+			}
+			else if (board[y - 2][x + 1] == otherColour) {
+				moves.push([x + 1, y - 2, true]);
+			}
+		}
+	}
+
+
+
 	moves.push([0, x - 1, y - 2]);
 	moves.push([0, x + 1, y - 2]);
 	moves.push([0, x + 2, y - 1]);
