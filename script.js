@@ -16,12 +16,22 @@ var board = [
 	["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"]
 ];
 var boardColour = "w";
+var moveCount = 0;
 var selectedCell = "";
 
 drawBoard();
 
+function getPseudoMoves() {
+	for (row of board) {
+		for (cell of board) {
+			if (cell.charAt(0) == activeColour) {
+				console.log("TODO");
+			}
+		}
+	}
+}
+
 function nextMove() {
-	// TODO: Update move counter
 	// Clear highlighting (e.g. selected cell)
 	if (selectedCell != "") {
 		y = RANKS[selectedCell.charAt(1)];
@@ -40,6 +50,9 @@ function nextMove() {
 		document.getElementById("ac").innerHTML = "White's move";
 		document.getElementById("ac").style.color = "#ffffff";
 	}
+	// Update move counter (half-move)
+	moveCount += 1;
+	document.getElementById("mc").innerHTML = moveCount + " moves";
 	// Draw board
 	drawBoard();
 }
@@ -65,26 +78,41 @@ function drawBoard() {
 	}
 }
 
+function clearSelectedCell() {
+	if (selectedCell != "") {
+		console.log("Deselecting selected cell...");
+		x = FILES[selectedCell.charAt(0)];
+		y = RANKS[selectedCell.charAt(1)];
+		BOARD.rows[y].cells[x].classList.remove("selected");
+		selectedCell = "";
+	}
+}
+
 function clickedCell(cell) {
 	console.clear();
+	
 	console.log("Selected pos: " + selectedCell);
 	console.log("Clicked pos: " + cell.id);
 	console.log("Clicked innerHTML: " + cell.innerHTML);
-	if (selectedCell != "") {
-		y = RANKS[selectedCell.charAt(1)];
-		x = FILES[selectedCell.charAt(0)];
-		BOARD.rows[y].cells[x].classList.remove("selected");
-	}
+	
+	x = FILES[cell.id.charAt(0)];
+	y = RANKS[cell.id.charAt(1)];
+	piece = board[y][x];
+	
+	// Click the selected cell to deselect
 	if (cell.id == selectedCell) {
-		console.log("Deselecting cell...");
-		selectedCell = "";
+		clearSelectedCell();
 	}
-	else {
-		console.log("Selecting cell...");
-		selectedCell = cell.id;
-		y = RANKS[cell.id.charAt(1)];
-		x = FILES[cell.id.charAt(0)];
+	// If active colour's piece
+	else if (piece != "" && piece.charAt(0) == activeColour) {
+		clearSelectedCell();
+		console.log("Selecting clicked cell...");
 		BOARD.rows[y].cells[x].classList.add("selected");
+		selectedCell = cell.id;
+	}
+	// Not active colour's piece
+	else {
+		clearSelectedCell();
 	}
 }
 
