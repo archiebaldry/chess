@@ -1,0 +1,84 @@
+div.bp {
+    background-image: url("pieces/bp.svg");
+}
+div.bn {
+    background-image: url("pieces/bn.svg");
+}
+div.bb {
+    background-image: url("pieces/bb.svg");
+}
+div.br {
+    background-image: url("pieces/br.svg");
+}
+div.bq {
+    background-image: url("pieces/bq.svg");
+}
+div.bk {
+    background-image: url("pieces/bk.svg");
+}
+div.file-a {
+    left: 0;
+}
+div.file-b {
+    left: 12.5%;
+}
+div.file-c {
+    left: 25%;
+}
+div.file-d {
+    left: 37.5%;
+}
+div.file-e {
+    left: 50%;
+}
+div.file-f {
+    left: 62.5%;
+}
+div.file-g {
+    left: 75%;
+}
+div.file-h {
+    left: 87.5%;
+}
+div.rank-8 {
+    top: 0;
+}
+div.rank-7 {
+    top: 12.5%;
+}
+div.rank-6 {
+    top: 25%;
+}
+div.rank-5 {
+    top: 37.5%;
+}
+div.rank-4 {
+    top: 50%;
+}
+div.rank-3 {
+    top: 62.5%;
+}
+div.rank-2 {
+    top: 75%;
+}
+div.rank-1 {
+    top: 87.5%;
+}
+div.wp {
+    background-image: url("pieces/wp.svg");
+}
+div.wn {
+    background-image: url("pieces/wn.svg");
+}
+div.wb {
+    background-image: url("pieces/wb.svg");
+}
+div.wr {
+    background-image: url("pieces/wr.svg");
+}
+div.wq {
+    background-image: url("pieces/wq.svg");
+}
+div.wk {
+    background-image: url("pieces/wk.svg");
+}

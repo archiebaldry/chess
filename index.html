@@ -3,102 +3,55 @@
 <head>
 	<title>Chess</title>
     <meta charset="UTF-8">
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="board.css">
+	<link rel="stylesheet" href="helper.css">
+	<link rel="stylesheet" href="main.css">
 </head>
 <body>
-	<h1 id="ac" style="color:#ffffff;">White's move</h1>
-	<h1 id="mc">0 moves</h1>
-	<button onclick="nextMove()">Next Move</button>
-	<button onclick="flipBoard()">Flip Board</button>
-	<input type="checkbox" id="lockBoard">
-	<label for="lockBoard">Lock</label>
-	<table id="board">
-		<tr>
-			<td id="a8" onClick="onCellClicked(this)"></td>
-			<td id="b8" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="c8" onClick="onCellClicked(this)"></td>
-			<td id="d8" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="e8" onClick="onCellClicked(this)"></td>
-			<td id="f8" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="g8" onClick="onCellClicked(this)"></td>
-			<td id="h8" onClick="onCellClicked(this)" class="dark"></td>
-		</tr>
-		<tr>
-			<td id="a7" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="b7" onClick="onCellClicked(this)"></td>
-			<td id="c7" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="d7" onClick="onCellClicked(this)"></td>
-			<td id="e7" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="f7" onClick="onCellClicked(this)"></td>
-			<td id="g7" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="h7" onClick="onCellClicked(this)"></td>
-		</tr>
-		<tr>
-			<td id="a6" onClick="onCellClicked(this)"></td>
-			<td id="b6" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="c6" onClick="onCellClicked(this)"></td>
-			<td id="d6" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="e6" onClick="onCellClicked(this)"></td>
-			<td id="f6" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="g6" onClick="onCellClicked(this)"></td>
-			<td id="h6" onClick="onCellClicked(this)" class="dark"></td>
-		</tr>
-		<tr>
-			<td id="a5" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="b5" onClick="onCellClicked(this)"></td>
-			<td id="c5" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="d5" onClick="onCellClicked(this)"></td>
-			<td id="e5" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="f5" onClick="onCellClicked(this)"></td>
-			<td id="g5" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="h5" onClick="onCellClicked(this)"></td>
-		</tr>
-		<tr>
-			<td id="a4" onClick="onCellClicked(this)"></td>
-			<td id="b4" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="c4" onClick="onCellClicked(this)"></td>
-			<td id="d4" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="e4" onClick="onCellClicked(this)"></td>
-			<td id="f4" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="g4" onClick="onCellClicked(this)"></td>
-			<td id="h4" onClick="onCellClicked(this)" class="dark"></td>
-		</tr>
-		<tr>
-			<td id="a3" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="b3" onClick="onCellClicked(this)"></td>
-			<td id="c3" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="d3" onClick="onCellClicked(this)"></td>
-			<td id="e3" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="f3" onClick="onCellClicked(this)"></td>
-			<td id="g3" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="h3" onClick="onCellClicked(this)"></td>
-		</tr>
-		<tr>
-			<td id="a2" onClick="onCellClicked(this)"></td>
-			<td id="b2" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="c2" onClick="onCellClicked(this)"></td>
-			<td id="d2" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="e2" onClick="onCellClicked(this)"></td>
-			<td id="f2" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="g2" onClick="onCellClicked(this)"></td>
-			<td id="h2" onClick="onCellClicked(this)" class="dark"></td>
-		</tr>
-		<tr>
-			<td id="a1" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="b1" onClick="onCellClicked(this)"></td>
-			<td id="c1" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="d1" onClick="onCellClicked(this)"></td>
-			<td id="e1" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="f1" onClick="onCellClicked(this)"></td>
-			<td id="g1" onClick="onCellClicked(this)" class="dark"></td>
-			<td id="h1" onClick="onCellClicked(this)"></td>
-		</tr>
-	</table>
-	<!-- <form onsubmit="fromFen(document.getElementById('fenInput').value); return false">
-        <label for="fenInput">FEN:</label>
-        <input type="text" id="fenInput" name="fenInput" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1">
-        <input type="submit" value="Submit">
-    </form> -->
-    <script src="script.js"></script>
+	<div class="container">
+		<div class="board">
+			<div class="selected file-f rank-5"></div>
+			<div class="last-move file-d rank-1"></div>
+			<div class="last-move file-f rank-2"></div>
+			<div class="piece br file-a rank-8"></div>
+			<div class="piece bn file-b rank-8"></div>
+			<div class="piece bb file-c rank-8"></div>
+			<div class="piece bq file-d rank-8"></div>
+			<div class="piece br file-f rank-8"></div>
+			<div class="piece bk file-g rank-8"></div>
+			<div class="piece bp file-a rank-7"></div>
+			<div class="piece bp file-b rank-7"></div>
+			<div class="piece bp file-c rank-7"></div>
+			<div class="piece bp file-d rank-7"></div>
+			<div class="piece bp file-g rank-7"></div>
+			<div class="piece bp file-h rank-7"></div>
+			<div class="piece bp file-e rank-6"></div>
+			<div class="piece bb file-c rank-5"></div>
+			<div class="piece wb file-f rank-5"></div>
+			<div class="piece wp file-f rank-4"></div>
+			<div class="piece wp file-h rank-4"></div>
+			<div class="piece wn file-f rank-3"></div>
+			<div class="piece wp file-g rank-3"></div>
+			<div class="piece wp file-a rank-2"></div>
+			<div class="piece wp file-b rank-2"></div>
+			<div class="piece wp file-c rank-2"></div>
+			<div class="piece wp file-d rank-2"></div>
+			<div class="piece wp file-e rank-2"></div>
+			<div class="piece wr file-a rank-1"></div>
+			<div class="piece wn file-b rank-1"></div>
+			<div class="piece wb file-c rank-1"></div>
+			<div class="piece bn file-d rank-1"></div>
+			<div class="piece wk file-e rank-1 check"></div>
+			<div class="piece wr file-h rank-1"></div>
+			<div class="capture-dest file-h rank-7"></div>
+			<div class="capture-dest file-e rank-6"></div>
+			<div class="move-dest file-g rank-6"></div>
+			<div class="move-dest file-e rank-4"></div>
+			<div class="move-dest file-g rank-4"></div>
+			<div class="move-dest file-d rank-3"></div>
+			<div class="move-dest file-h rank-3"></div>
+		</div>
+		<input id="fen" type="text">
+	</div>
+	<script src="script.js"></script>
 </body>
-</html>

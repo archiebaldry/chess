@@ -1,0 +1,21 @@
+body {
+    background-color: #252525;
+    font-family: "Noto Sans", sans-serif;
+    margin: 8px;
+}
+div.container {
+    background-color: purple;
+    height: 80vmin;
+    margin: 0 auto;
+    width: 80vmin;
+}
+input[type=text] {
+    background-color: #252520;
+    border: 1px solid #404040;
+    box-sizing: border-box;
+    color: #ccc;
+    height: 32px;
+    margin-top: 8px;
+    padding: 1px 8px;
+    width: 100%;
+}
