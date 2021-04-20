@@ -30,8 +30,8 @@ function pieceClicked(piece) {
 	let classes = piece.classList;
 	let colour = classes.item(1).charAt(0);
 	if (colour == activeColour) {
-		let x = classes.item(2).charAt(1);
-		let y = classes.item(3).charAt(1);
+		let x = parseInt(classes.item(2).charAt(1));
+		let y = parseInt(classes.item(3).charAt(1));
 		// Clear selection
 		if (x == selectedPos.x && y == selectedPos.y) {
 			selectedPos = {x: -1, y: -1};
