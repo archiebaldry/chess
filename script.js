@@ -6,27 +6,25 @@ const FEN_INPUT = document.getElementById("fen");
 var activeColour = "w";
 var board = [
 	["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"],
-	["bp", "bp", "bp", "bp", "", "bp", "bp", "bp"],
+	["", "bp", "bp", "bp", "", "bp", "bp", "bp"],
 	["", "", "wp", "wp", "bp", "", "", ""],
-	["", "", "", "", "", "wb", "", ""],
-	["", "", "", "", "", "", "", ""],
+	["bp", "", "", "", "", "wb", "", ""],
+	["", "wk", "", "", "", "", "", ""],
 	["", "", "bp", "", "", "", "", ""],
 	["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
 	["wr", "wn", "wb", "wq", "wk", "", "wn", "wr"]
 ];
-var selectedPos = {x: 5, y: 3};
+var selectedPos = {x: -1, y: -1};
 var lastMovePos = {x: 3, y: 7};
 var lastMoveDestPos = {x: 5, y: 6};
 var checkPos = {x: 4, y: 7};
-var movesPos = [{x: 6, y: 2}, {x: 4, y: 4}, {x: 6, y: 4}, {x: 3, y: 5}, {x: 7, y: 5}];
-var capturesPos = [{x: 7, y: 1}, {x: 4, y: 2}];
+var movesPos = [];
+var capturesPos = [];
 
 FEN_INPUT.value = FEN;
 drawBoard();
 
 function pieceClicked(piece) {
-	console.clear();
-	console.log("Piece clicked");
 	let classes = piece.classList;
 	let colour = classes.item(1).charAt(0);
 	if (colour == activeColour) {
@@ -50,10 +48,30 @@ function pieceClicked(piece) {
 	}
 }
 
+function moveClicked(move) {
+	console.clear();
+	console.log("Move clicked");
+	let classes = move.classList;
+	let x = parseInt(classes.item(1).charAt(1));
+	let y = parseInt(classes.item(2).charAt(1));
+}
+
+function captureClicked(capture) {
+	console.clear();
+	console.log("Capture clicked");
+	let classes = capture.classList;
+	let x = parseInt(classes.item(1).charAt(1));
+	let y = parseInt(classes.item(2).charAt(1));
+}
+
 function getPseudo(type, colour, x, y) {
 	// TODO: Promotion, en passant
 	let moves = [];
 	let captures = [];
+	let otherColour = "b";
+	if (activeColour == "b") {
+		otherColour = "w";
+	}
 	if (type == "p") {
 		if (colour == "w") {
 			// Every move requires at least one free cell above
@@ -100,25 +118,97 @@ function getPseudo(type, colour, x, y) {
 			}
 		}
 	}
+	else if (type == "k") {
+		// North-west, north and north-east
+		if (y != 0) {
+			// North-west
+			if (x != 0) {
+				// Move
+				if (board[y - 1][x - 1] == "") {
+					moves.push({x: x - 1, y: y - 1});
+				}
+				// Capture
+				else if (board[y - 1][x - 1].charAt(0) == otherColour) {
+					captures.push({x: x - 1, y: y - 1});
+				}
+			}
+			// North, Move
+			if (board[y - 1][x] == "") {
+				moves.push({x: x, y: y - 1});
+			}
+			// North, Capture
+			else if (board[y - 1][x].charAt(0) == otherColour) {
+				captures.push({x: x, y: y - 1});
+			}
+			// North-east
+			if (x != 7) {
+				// Move
+				if (board[y - 1][x + 1] == "") {
+					moves.push({x: x + 1, y: y - 1});
+				}
+				// Capture
+				else if (board[y - 1][x + 1].charAt(0) == otherColour) {
+					captures.push({x: x + 1, y: y - 1});
+				}
+			}
+		}
+		// East
+		if (x != 7) {
+			// Move
+			if (board[y][x + 1] == "") {
+				moves.push({x: x + 1, y: y});
+			}
+			// Capture
+			else if (board[y][x + 1].charAt(0) == otherColour) {
+				captures.push({x: x + 1, y: y});
+			}
+		}
+		// South-east, south and south-west
+		if (y != 7) {
+			// South-east
+			if (x != 7) {
+				// Move
+				if (board[y + 1][x + 1] == "") {
+					moves.push({x: x + 1, y: y + 1});
+				}
+				// Capture
+				else if (board[y + 1][x + 1].charAt(0) == otherColour) {
+					captures.push({x: x + 1, y: y + 1});
+				}
+			}
+			// South, Move
+			if (board[y + 1][x] == "") {
+				moves.push({x: x, y: y + 1});
+			}
+			// South, Capture
+			else if (board[y + 1][x].charAt(0) == otherColour) {
+				captures.push({x: x, y: y + 1});
+			}
+			// South-west
+			if (x != 0) {
+				// Move
+				if (board[y + 1][x - 1] == "") {
+					moves.push({x: x - 1, y: y + 1});
+				}
+				// Capture
+				else if (board[y + 1][x - 1].charAt(0) == otherColour) {
+					captures.push({x: x - 1, y: y + 1});
+				}
+			}
+		}
+		// West
+		if (x != 0) {
+			// Move
+			if (board[y][x - 1] == "") {
+				moves.push({x: x - 1, y: y});
+			}
+			// Capture
+			else if (board[y][x - 1].charAt(0) == otherColour) {
+				captures.push({x: x - 1, y: y});
+			}
+		}
+	}
 	return [moves, captures];
-}
-
-function moveClicked(move) {
-	console.clear();
-	console.log("Move clicked");
-
-	let classes = move.classList;
-	let x = classes.item(1).charAt(1);
-	let y = classes.item(2).charAt(1);
-}
-
-function captureClicked(capture) {
-	console.clear();
-	console.log("Capture clicked");
-
-	let classes = capture.classList;
-	let x = classes.item(1).charAt(1);
-	let y = classes.item(2).charAt(1);
 }
 
 function drawBoard() {
