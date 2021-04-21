@@ -9,7 +9,7 @@ var board = [
 	["", "bp", "bp", "bp", "", "bp", "bp", "bp"],
 	["", "", "wp", "wp", "bp", "", "", ""],
 	["bp", "", "", "", "", "wb", "", ""],
-	["", "wk", "", "", "", "", "", ""],
+	["", "wk", "wn", "", "", "", "", ""],
 	["", "", "bp", "", "", "", "", ""],
 	["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
 	["wr", "wn", "wb", "wq", "wk", "", "wn", "wr"]
@@ -18,8 +18,7 @@ var selectedPos = {x: -1, y: -1};
 var lastMovePos = {x: 3, y: 7};
 var lastMoveDestPos = {x: 5, y: 6};
 var checkPos = {x: 4, y: 7};
-var movesPos = [];
-var capturesPos = [];
+var moves = [];
 
 FEN_INPUT.value = FEN;
 drawBoard();
@@ -33,16 +32,13 @@ function pieceClicked(piece) {
 		// Clear selection
 		if (x == selectedPos.x && y == selectedPos.y) {
 			selectedPos = {x: -1, y: -1};
-			movesPos = [];
-			capturesPos = [];
+			moves = [];
 		}
 		// Select piece, calculate moves
 		else {
-			selectedPos = {x: x, y: y};
 			let type = classes.item(1).charAt(1);
-			let pseudo = getPseudo(type, colour, x, y);
-			movesPos = pseudo[0];
-			capturesPos = pseudo[1];
+			selectedPos = {x: x, y: y};
+			moves = getPseudoMoves(type, colour, x, y);
 		}
 		drawBoard();
 	}
@@ -64,60 +60,164 @@ function captureClicked(capture) {
 	let y = parseInt(classes.item(2).charAt(1));
 }
 
-function getPseudo(type, colour, x, y) {
+function getPseudoMoves(type, colour, x, y) {
 	// TODO: Promotion, en passant
-	let moves = [];
-	let captures = [];
-	let otherColour = "b";
-	if (activeColour == "b") {
-		otherColour = "w";
-	}
+	let pseudoMoves = [];
+	let opponent = "b";
+	if (activeColour == "b") {opponent = "w";}
+	// Pawn
 	if (type == "p") {
+		// White
 		if (colour == "w") {
 			// Every move requires at least one free cell above
 			if (y == 0) {
-				return [moves, captures];
+				return pseudoMoves;
 			}
 			// Move: Push (up 1)
 			if (board[y - 1][x] == "") {
-				moves.push({x: x, y: y - 1});
+				pseudoMoves.push({isCapture: false, x: x, y: y - 1});
 			}
 			// Move: Double push (up 2, if on 2nd rank)
 			if (y == 6 && board[y - 1][x] == "" && board[y - 2][x] == "") {
-				moves.push({x: x, y: y - 2});
+				pseudoMoves.push({isCapture: false, x: x, y: y - 2});
 			}
 			// Capture: Left (up 1, left 1)
 			if (x != 0 && board[y - 1][x - 1].charAt(0) == "b") {
-				captures.push({x: x - 1, y: y - 1});
+				pseudoMoves.push({isCapture: true, x: x - 1, y: y - 1});
 			}
 			// Capture: Right (up 1, right 1)
 			if (x != 7 && board[y - 1][x + 1].charAt(0) == "b") {
-				captures.push({x: x + 1, y: y - 1});
+				pseudoMoves.push({isCapture: true, x: x + 1, y: y - 1});
 			}
 		}
+		// Black
 		else {
 			// Every move requires at least one free cell below
 			if (y == 7) {
-				return [moves, captures];
+				return pseudoMoves;
 			}
 			// Move: Push (down 1)
 			if (board[y + 1][x] == "") {
-				moves.push({x: x, y: y + 1});
+				pseudoMoves.push({isCapture: false, x: x, y: y + 1});
 			}
 			// Move: Double push (down 2, if on 7th rank)
 			if (y == 1 && board[y + 1][x] == "" && board[y + 2][x] == "") {
-				moves.push({x: x, y: y + 2});
+				pseudoMoves.push({isCapture: false, x: x, y: y + 2});
 			}
 			// Capture: Left (down 1, left 1)
 			if (x != 0 && board[y + 1][x - 1].charAt(0) == "w") {
-				captures.push({x: x - 1, y: y + 1});
+				pseudoMoves.push({isCapture: true, x: x - 1, y: y + 1});
 			}
 			// Capture: Right (down 1, right 1)
 			if (x != 7 && board[y + 1][x + 1].charAt(0) == "w") {
-				captures.push({x: x + 1, y: y + 1});
+				pseudoMoves.push({isCapture: true, x: x + 1, y: y + 1});
 			}
 		}
 	}
+	// Knight
+	else if (type == "n") {
+		// Top-left and top-right
+		if (y > 1) {
+			// Top-left
+			if (x != 0) {
+				// Move
+				if (board[y - 2][x - 1] == "") {
+					pseudoMoves.push({isCapture: false, x: x - 1, y: y - 2});
+				}
+				// Capture
+				else if (board[y - 2][x - 1].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x - 1, y: y - 2});
+				}
+			}
+			// Top-right
+			if (x != 7) {
+				// Move
+				if (board[y - 2][x + 1] == "") {
+					pseudoMoves.push({isCapture: false, x: x + 1, y: y - 2});
+				}
+				// Capture
+				else if (board[y - 2][x + 1].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x + 1, y: y - 2});
+				}
+			}
+		}
+		// Upper-right and lower-right
+		if (x < 6) {
+			// Upper-right
+			if (y != 0) {
+				// Move
+				if (board[y - 1][x + 2] == "") {
+					pseudoMoves.push({isCapture: false, x: x + 2, y: y - 1});
+				}
+				// Capture
+				else if (board[y - 1][x + 2].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x + 2, y: y - 1});
+				}
+			}
+			// Lower-right
+			if (y != 7) {
+				// Move
+				if (board[y + 1][x + 2] == "") {
+					pseudoMoves.push({isCapture: false, x: x + 2, y: y + 1});
+				}
+				// Capture
+				else if (board[y + 1][x + 2].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x + 2, y: y + 1});
+				}
+			}
+		}
+		// Bottom-left and bottom-right
+		if (y < 6) {
+			// Bottom-left
+			if (x != 0) {
+				// Move
+				if (board[y + 2][x - 1] == "") {
+					pseudoMoves.push({isCapture: false, x: x - 1, y: y + 2});
+				}
+				// Capture
+				else if (board[y + 2][x - 1].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x - 1, y: y + 2});
+				}
+			}
+			// Bottom-right
+			if (x != 7) {
+				// Move
+				if (board[y + 2][x + 1] == "") {
+					pseudoMoves.push({isCapture: false, x: x + 1, y: y + 2});
+				}
+				// Capture
+				else if (board[y + 2][x + 1].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x + 1, y: y + 2});
+				}
+			}
+		}
+		// Upper-left and lower-left
+		if (x < 6) {
+			// Upper-left
+			if (y != 0) {
+				// Move
+				if (board[y - 1][x - 2] == "") {
+					pseudoMoves.push({isCapture: false, x: x - 2, y: y - 1});
+				}
+				// Capture
+				else if (board[y - 1][x - 2].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x - 2, y: y - 1});
+				}
+			}
+			// Lower-left
+			if (y != 7) {
+				// Move
+				if (board[y + 1][x - 2] == "") {
+					pseudoMoves.push({isCapture: false, x: x - 2, y: y + 1});
+				}
+				// Capture
+				else if (board[y + 1][x - 2].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x - 2, y: y + 1});
+				}
+			}
+		}
+	}
+	// King
 	else if (type == "k") {
 		// North-west, north and north-east
 		if (y != 0) {
@@ -125,30 +225,30 @@ function getPseudo(type, colour, x, y) {
 			if (x != 0) {
 				// Move
 				if (board[y - 1][x - 1] == "") {
-					moves.push({x: x - 1, y: y - 1});
+					pseudoMoves.push({isCapture: false, x: x - 1, y: y - 1});
 				}
 				// Capture
-				else if (board[y - 1][x - 1].charAt(0) == otherColour) {
-					captures.push({x: x - 1, y: y - 1});
+				else if (board[y - 1][x - 1].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x - 1, y: y - 1});
 				}
 			}
 			// North, Move
 			if (board[y - 1][x] == "") {
-				moves.push({x: x, y: y - 1});
+				pseudoMoves.push({isCapture: false, x: x, y: y - 1});
 			}
 			// North, Capture
-			else if (board[y - 1][x].charAt(0) == otherColour) {
-				captures.push({x: x, y: y - 1});
+			else if (board[y - 1][x].charAt(0) == opponent) {
+				pseudoMoves.push({isCapture: true, x: x, y: y - 1});
 			}
 			// North-east
 			if (x != 7) {
 				// Move
 				if (board[y - 1][x + 1] == "") {
-					moves.push({x: x + 1, y: y - 1});
+					pseudoMoves.push({isCapture: false, x: x + 1, y: y - 1});
 				}
 				// Capture
-				else if (board[y - 1][x + 1].charAt(0) == otherColour) {
-					captures.push({x: x + 1, y: y - 1});
+				else if (board[y - 1][x + 1].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x + 1, y: y - 1});
 				}
 			}
 		}
@@ -156,11 +256,11 @@ function getPseudo(type, colour, x, y) {
 		if (x != 7) {
 			// Move
 			if (board[y][x + 1] == "") {
-				moves.push({x: x + 1, y: y});
+				pseudoMoves.push({isCapture: false, x: x + 1, y: y});
 			}
 			// Capture
-			else if (board[y][x + 1].charAt(0) == otherColour) {
-				captures.push({x: x + 1, y: y});
+			else if (board[y][x + 1].charAt(0) == opponent) {
+				pseudoMoves.push({isCapture: true, x: x + 1, y: y});
 			}
 		}
 		// South-east, south and south-west
@@ -169,30 +269,30 @@ function getPseudo(type, colour, x, y) {
 			if (x != 7) {
 				// Move
 				if (board[y + 1][x + 1] == "") {
-					moves.push({x: x + 1, y: y + 1});
+					pseudoMoves.push({isCapture: false, x: x + 1, y: y + 1});
 				}
 				// Capture
-				else if (board[y + 1][x + 1].charAt(0) == otherColour) {
-					captures.push({x: x + 1, y: y + 1});
+				else if (board[y + 1][x + 1].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x + 1, y: y + 1});
 				}
 			}
 			// South, Move
 			if (board[y + 1][x] == "") {
-				moves.push({x: x, y: y + 1});
+				pseudoMoves.push({isCapture: false, x: x, y: y + 1});
 			}
 			// South, Capture
-			else if (board[y + 1][x].charAt(0) == otherColour) {
-				captures.push({x: x, y: y + 1});
+			else if (board[y + 1][x].charAt(0) == opponent) {
+				pseudoMoves.push({isCapture: true, x: x, y: y + 1});
 			}
 			// South-west
 			if (x != 0) {
 				// Move
 				if (board[y + 1][x - 1] == "") {
-					moves.push({x: x - 1, y: y + 1});
+					pseudoMoves.push({isCapture: false, x: x - 1, y: y + 1});
 				}
 				// Capture
-				else if (board[y + 1][x - 1].charAt(0) == otherColour) {
-					captures.push({x: x - 1, y: y + 1});
+				else if (board[y + 1][x - 1].charAt(0) == opponent) {
+					pseudoMoves.push({isCapture: true, x: x - 1, y: y + 1});
 				}
 			}
 		}
@@ -200,15 +300,15 @@ function getPseudo(type, colour, x, y) {
 		if (x != 0) {
 			// Move
 			if (board[y][x - 1] == "") {
-				moves.push({x: x - 1, y: y});
+				pseudoMoves.push({isCapture: false, x: x - 1, y: y});
 			}
 			// Capture
-			else if (board[y][x - 1].charAt(0) == otherColour) {
-				captures.push({x: x - 1, y: y});
+			else if (board[y][x - 1].charAt(0) == opponent) {
+				pseudoMoves.push({isCapture: true, x: x - 1, y: y});
 			}
 		}
 	}
-	return [moves, captures];
+	return pseudoMoves;
 }
 
 function drawBoard() {
@@ -254,17 +354,16 @@ function drawBoard() {
 		y += 1;
 	}
 	// Draw moves
-	for (movePos of movesPos) {
+	for (move of moves) {
 		let m = document.createElement("div");
-		m.className = "move " + " x" + movePos.x + " y" + movePos.y;
-		m.onclick = function() {moveClicked(this);};
+		if (move.isCapture) {
+			m.className = "capture " + " x" + move.x + " y" + move.y;
+			m.onclick = function() {captureClicked(this);};
+		}
+		else {
+			m.className = "move " + " x" + move.x + " y" + move.y;
+			m.onclick = function() {moveClicked(this);};
+		}
 		BOARD.appendChild(m)
-	}
-	// Draw captures
-	for (capturePos of capturesPos) {
-		let c = document.createElement("div");
-		c.className = "capture " + " x" + capturePos.x + " y" + capturePos.y;
-		c.onclick = function() {captureClicked(this);};
-		BOARD.appendChild(c)
 	}
 }
