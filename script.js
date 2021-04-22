@@ -8,10 +8,10 @@ var board = [
 	["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"],
 	["", "bp", "bp", "bp", "", "bp", "bp", "bp"],
 	["", "", "wp", "wp", "bp", "", "", ""],
-	["bp", "", "", "", "", "wb", "", ""],
-	["", "wk", "wn", "", "", "", "", ""],
+	["bp", "", "", "", "", "", "wq", ""],
+	["", "wk", "wn", "", "wr", "wb", "", ""],
 	["", "", "bp", "", "", "", "", ""],
-	["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
+	["wp", "wp", "wp", "", "wp", "wp", "wp", ""],
 	["wr", "wn", "wb", "wq", "wk", "", "wn", "wr"]
 ];
 var selectedPos = {x: -1, y: -1};
@@ -60,252 +60,456 @@ function captureClicked(capture) {
 	let y = parseInt(classes.item(2).charAt(1));
 }
 
+function getPawnMoves(colour, x, y) {
+	let m = [];
+	// White
+	if (colour == "w") {
+		// Every move requires at least one free cell above
+		if (y == 0) {
+			return m;
+		}
+		// Push
+		if (board[y - 1][x] == "") {
+			m.push({isCapture: false, x: x, y: y - 1});
+		}
+		// Double push
+		if (y == 6 && board[y - 1][x] == "" && board[y - 2][x] == "") {
+			m.push({isCapture: false, x: x, y: y - 2});
+		}
+		// Left
+		if (x != 0 && board[y - 1][x - 1].charAt(0) == "b") {
+			m.push({isCapture: true, x: x - 1, y: y - 1});
+		}
+		// Right
+		if (x != 7 && board[y - 1][x + 1].charAt(0) == "b") {
+			m.push({isCapture: true, x: x + 1, y: y - 1});
+		}
+	}
+	// Black
+	else {
+		// Every move requires at least one free cell below
+		if (y == 7) {
+			return m;
+		}
+		// Push
+		if (board[y + 1][x] == "") {
+			m.push({isCapture: false, x: x, y: y + 1});
+		}
+		// Double push
+		if (y == 1 && board[y + 1][x] == "" && board[y + 2][x] == "") {
+			m.push({isCapture: false, x: x, y: y + 2});
+		}
+		// Left (black perspective)
+		if (x != 7 && board[y + 1][x + 1].charAt(0) == "w") {
+			m.push({isCapture: true, x: x + 1, y: y + 1});
+		}
+		// Right (black perspective)
+		if (x != 0 && board[y + 1][x - 1].charAt(0) == "w") {
+			m.push({isCapture: true, x: x - 1, y: y + 1});
+		}
+	}
+	return m;
+}
+
+function getKnightMoves(opponent, x, y) {
+	let m = [];
+	// Top-left and top-right
+	if (y > 1) {
+		// Top-left
+		if (x != 0) {
+			// Move
+			if (board[y - 2][x - 1] == "") {
+				m.push({isCapture: false, x: x - 1, y: y - 2});
+			}
+			// Capture
+			else if (board[y - 2][x - 1].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x - 1, y: y - 2});
+			}
+		}
+		// Top-right
+		if (x != 7) {
+			// Move
+			if (board[y - 2][x + 1] == "") {
+				m.push({isCapture: false, x: x + 1, y: y - 2});
+			}
+			// Capture
+			else if (board[y - 2][x + 1].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x + 1, y: y - 2});
+			}
+		}
+	}
+	// Upper-right and lower-right
+	if (x < 6) {
+		// Upper-right
+		if (y != 0) {
+			// Move
+			if (board[y - 1][x + 2] == "") {
+				m.push({isCapture: false, x: x + 2, y: y - 1});
+			}
+			// Capture
+			else if (board[y - 1][x + 2].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x + 2, y: y - 1});
+			}
+		}
+		// Lower-right
+		if (y != 7) {
+			// Move
+			if (board[y + 1][x + 2] == "") {
+				m.push({isCapture: false, x: x + 2, y: y + 1});
+			}
+			// Capture
+			else if (board[y + 1][x + 2].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x + 2, y: y + 1});
+			}
+		}
+	}
+	// Bottom-left and bottom-right
+	if (y < 6) {
+		// Bottom-left
+		if (x != 0) {
+			// Move
+			if (board[y + 2][x - 1] == "") {
+				m.push({isCapture: false, x: x - 1, y: y + 2});
+			}
+			// Capture
+			else if (board[y + 2][x - 1].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x - 1, y: y + 2});
+			}
+		}
+		// Bottom-right
+		if (x != 7) {
+			// Move
+			if (board[y + 2][x + 1] == "") {
+				m.push({isCapture: false, x: x + 1, y: y + 2});
+			}
+			// Capture
+			else if (board[y + 2][x + 1].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x + 1, y: y + 2});
+			}
+		}
+	}
+	// Upper-left and lower-left
+	if (x > 1) {
+		// Upper-left
+		if (y != 0) {
+			// Move
+			if (board[y - 1][x - 2] == "") {
+				m.push({isCapture: false, x: x - 2, y: y - 1});
+			}
+			// Capture
+			else if (board[y - 1][x - 2].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x - 2, y: y - 1});
+			}
+		}
+		// Lower-left
+		if (y != 7) {
+			// Move
+			if (board[y + 1][x - 2] == "") {
+				m.push({isCapture: false, x: x - 2, y: y + 1});
+			}
+			// Capture
+			else if (board[y + 1][x - 2].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x - 2, y: y + 1});
+			}
+		}
+	}
+	return m;
+}
+
+function getBishopMoves(opponent, x, y) {
+	let m = [];
+	// North-east
+	for (let i = 1; i < 8; i ++) {
+		if (x + i < 8 && y - i > -1) {
+			// Move
+			if (board[y - i][x + i] == "") {
+				m.push({isCapture: false, x: x + i, y: y - i});
+			}
+			// Capture
+			else if (board[y - i][x + i].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x + i, y: y - i});
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		else {
+			break;
+		}
+	}
+	// South-east
+	for (let i = 1; i < 8; i ++) {
+		if (x + i < 8 && y + i < 8) {
+			// Move
+			if (board[y + i][x + i] == "") {
+				m.push({isCapture: false, x: x + i, y: y + i});
+			}
+			// Capture
+			else if (board[y + i][x + i].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x + i, y: y + i});
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		else {
+			break;
+		}
+	}
+	// South-west
+	for (let i = 1; i < 8; i ++) {
+		if (x - i > -1 && y + i < 8) {
+			// Move
+			if (board[y + i][x - i] == "") {
+				m.push({isCapture: false, x: x - i, y: y + i});
+			}
+			// Capture
+			else if (board[y + i][x - i].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x - i, y: y + i});
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		else {
+			break;
+		}
+	}
+	// North-west
+	for (let i = 1; i < 8; i ++) {
+		if (x - i > -1 && y - i > -1) {
+			// Move
+			if (board[y - i][x - i] == "") {
+				m.push({isCapture: false, x: x - i, y: y - i});
+			}
+			// Capture
+			else if (board[y - i][x - i].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x - i, y: y - i});
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		else {
+			break;
+		}
+	}
+	return m;
+}
+
+function getRookMoves(opponent, x, y) {
+	let m = [];
+	// North
+	for (let i = 1; i < 8; i++) {
+		if (y - i > -1) {
+			// Move
+			if (board[y - i][x] == "") {
+				m.push({isCapture: false, x: x, y: y - i});
+			}
+			// Capture
+			else if (board[y - i][x].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x, y: y - i});
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		else {
+			break;
+		}
+	}
+	// East
+	for (let i = 1; i < 8; i++) {
+		if (x + i < 8) {
+			// Move
+			if (board[y][x + i] == "") {
+				m.push({isCapture: false, x: x + i, y: y});
+			}
+			// Capture
+			else if (board[y][x + i].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x + i, y: y});
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		else {
+			break;
+		}
+	}
+	// South
+	for (let i = 1; i < 8; i++) {
+		if (y + i < 8) {
+			// Move
+			if (board[y + i][x] == "") {
+				m.push({isCapture: false, x: x, y: y + i});
+			}
+			// Capture
+			else if (board[y + i][x].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x, y: y + i});
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		else {
+			break;
+		}
+	}
+	// West
+	for (let i = 1; i < 8; i++) {
+		if (x - i > -1) {
+			// Move
+			if (board[y][x - i] == "") {
+				m.push({isCapture: false, x: x - i, y: y});
+			}
+			// Capture
+			else if (board[y][x - i].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x - i, y: y});
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		else {
+			break;
+		}
+	}
+	return m;
+}
+
+function getKingMoves(opponent, x, y) {
+	let m = [];
+	// North-west, north and north-east
+	if (y != 0) {
+		// North-west
+		if (x != 0) {
+			// Move
+			if (board[y - 1][x - 1] == "") {
+				m.push({isCapture: false, x: x - 1, y: y - 1});
+			}
+			// Capture
+			else if (board[y - 1][x - 1].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x - 1, y: y - 1});
+			}
+		}
+		// North, Move
+		if (board[y - 1][x] == "") {
+			m.push({isCapture: false, x: x, y: y - 1});
+		}
+		// North, Capture
+		else if (board[y - 1][x].charAt(0) == opponent) {
+			m.push({isCapture: true, x: x, y: y - 1});
+		}
+		// North-east
+		if (x != 7) {
+			// Move
+			if (board[y - 1][x + 1] == "") {
+				m.push({isCapture: false, x: x + 1, y: y - 1});
+			}
+			// Capture
+			else if (board[y - 1][x + 1].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x + 1, y: y - 1});
+			}
+		}
+	}
+	// East
+	if (x != 7) {
+		// Move
+		if (board[y][x + 1] == "") {
+			m.push({isCapture: false, x: x + 1, y: y});
+		}
+		// Capture
+		else if (board[y][x + 1].charAt(0) == opponent) {
+			m.push({isCapture: true, x: x + 1, y: y});
+		}
+	}
+	// South-east, south and south-west
+	if (y != 7) {
+		// South-east
+		if (x != 7) {
+			// Move
+			if (board[y + 1][x + 1] == "") {
+				m.push({isCapture: false, x: x + 1, y: y + 1});
+			}
+			// Capture
+			else if (board[y + 1][x + 1].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x + 1, y: y + 1});
+			}
+		}
+		// South, Move
+		if (board[y + 1][x] == "") {
+			m.push({isCapture: false, x: x, y: y + 1});
+		}
+		// South, Capture
+		else if (board[y + 1][x].charAt(0) == opponent) {
+			m.push({isCapture: true, x: x, y: y + 1});
+		}
+		// South-west
+		if (x != 0) {
+			// Move
+			if (board[y + 1][x - 1] == "") {
+				m.push({isCapture: false, x: x - 1, y: y + 1});
+			}
+			// Capture
+			else if (board[y + 1][x - 1].charAt(0) == opponent) {
+				m.push({isCapture: true, x: x - 1, y: y + 1});
+			}
+		}
+	}
+	// West
+	if (x != 0) {
+		// Move
+		if (board[y][x - 1] == "") {
+			m.push({isCapture: false, x: x - 1, y: y});
+		}
+		// Capture
+		else if (board[y][x - 1].charAt(0) == opponent) {
+			m.push({isCapture: true, x: x - 1, y: y});
+		}
+	}
+	return m;
+}
+
 function getPseudoMoves(type, colour, x, y) {
 	// TODO: Promotion, en passant
 	let pseudoMoves = [];
-	let opponent = "b";
-	if (activeColour == "b") {opponent = "w";}
 	// Pawn
 	if (type == "p") {
-		// White
-		if (colour == "w") {
-			// Every move requires at least one free cell above
-			if (y == 0) {
-				return pseudoMoves;
-			}
-			// Move: Push (up 1)
-			if (board[y - 1][x] == "") {
-				pseudoMoves.push({isCapture: false, x: x, y: y - 1});
-			}
-			// Move: Double push (up 2, if on 2nd rank)
-			if (y == 6 && board[y - 1][x] == "" && board[y - 2][x] == "") {
-				pseudoMoves.push({isCapture: false, x: x, y: y - 2});
-			}
-			// Capture: Left (up 1, left 1)
-			if (x != 0 && board[y - 1][x - 1].charAt(0) == "b") {
-				pseudoMoves.push({isCapture: true, x: x - 1, y: y - 1});
-			}
-			// Capture: Right (up 1, right 1)
-			if (x != 7 && board[y - 1][x + 1].charAt(0) == "b") {
-				pseudoMoves.push({isCapture: true, x: x + 1, y: y - 1});
-			}
+		pseudoMoves = getPawnMoves(colour, x, y);
+	}
+	else {
+		let opponent = "b";
+		if (activeColour == "b") {
+			opponent = "w";
 		}
-		// Black
+		// Knight
+		else if (type == "n") {
+			pseudoMoves = getKnightMoves(opponent, x, y);
+		}
+		// Bishop
+		else if (type == "b") {
+			pseudoMoves = getBishopMoves(opponent, x, y);
+		}
+		// Rook
+		else if (type == "r") {
+			pseudoMoves = getRookMoves(opponent, x, y);
+		}
+		// Queen
+		else if (type == "q") {
+			pseudoMoves = getBishopMoves(opponent, x, y).concat(getRookMoves(opponent, x, y));
+		}
+		// King
 		else {
-			// Every move requires at least one free cell below
-			if (y == 7) {
-				return pseudoMoves;
-			}
-			// Move: Push (down 1)
-			if (board[y + 1][x] == "") {
-				pseudoMoves.push({isCapture: false, x: x, y: y + 1});
-			}
-			// Move: Double push (down 2, if on 7th rank)
-			if (y == 1 && board[y + 1][x] == "" && board[y + 2][x] == "") {
-				pseudoMoves.push({isCapture: false, x: x, y: y + 2});
-			}
-			// Capture: Left (down 1, left 1)
-			if (x != 0 && board[y + 1][x - 1].charAt(0) == "w") {
-				pseudoMoves.push({isCapture: true, x: x - 1, y: y + 1});
-			}
-			// Capture: Right (down 1, right 1)
-			if (x != 7 && board[y + 1][x + 1].charAt(0) == "w") {
-				pseudoMoves.push({isCapture: true, x: x + 1, y: y + 1});
-			}
-		}
-	}
-	// Knight
-	else if (type == "n") {
-		// Top-left and top-right
-		if (y > 1) {
-			// Top-left
-			if (x != 0) {
-				// Move
-				if (board[y - 2][x - 1] == "") {
-					pseudoMoves.push({isCapture: false, x: x - 1, y: y - 2});
-				}
-				// Capture
-				else if (board[y - 2][x - 1].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x - 1, y: y - 2});
-				}
-			}
-			// Top-right
-			if (x != 7) {
-				// Move
-				if (board[y - 2][x + 1] == "") {
-					pseudoMoves.push({isCapture: false, x: x + 1, y: y - 2});
-				}
-				// Capture
-				else if (board[y - 2][x + 1].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x + 1, y: y - 2});
-				}
-			}
-		}
-		// Upper-right and lower-right
-		if (x < 6) {
-			// Upper-right
-			if (y != 0) {
-				// Move
-				if (board[y - 1][x + 2] == "") {
-					pseudoMoves.push({isCapture: false, x: x + 2, y: y - 1});
-				}
-				// Capture
-				else if (board[y - 1][x + 2].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x + 2, y: y - 1});
-				}
-			}
-			// Lower-right
-			if (y != 7) {
-				// Move
-				if (board[y + 1][x + 2] == "") {
-					pseudoMoves.push({isCapture: false, x: x + 2, y: y + 1});
-				}
-				// Capture
-				else if (board[y + 1][x + 2].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x + 2, y: y + 1});
-				}
-			}
-		}
-		// Bottom-left and bottom-right
-		if (y < 6) {
-			// Bottom-left
-			if (x != 0) {
-				// Move
-				if (board[y + 2][x - 1] == "") {
-					pseudoMoves.push({isCapture: false, x: x - 1, y: y + 2});
-				}
-				// Capture
-				else if (board[y + 2][x - 1].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x - 1, y: y + 2});
-				}
-			}
-			// Bottom-right
-			if (x != 7) {
-				// Move
-				if (board[y + 2][x + 1] == "") {
-					pseudoMoves.push({isCapture: false, x: x + 1, y: y + 2});
-				}
-				// Capture
-				else if (board[y + 2][x + 1].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x + 1, y: y + 2});
-				}
-			}
-		}
-		// Upper-left and lower-left
-		if (x < 6) {
-			// Upper-left
-			if (y != 0) {
-				// Move
-				if (board[y - 1][x - 2] == "") {
-					pseudoMoves.push({isCapture: false, x: x - 2, y: y - 1});
-				}
-				// Capture
-				else if (board[y - 1][x - 2].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x - 2, y: y - 1});
-				}
-			}
-			// Lower-left
-			if (y != 7) {
-				// Move
-				if (board[y + 1][x - 2] == "") {
-					pseudoMoves.push({isCapture: false, x: x - 2, y: y + 1});
-				}
-				// Capture
-				else if (board[y + 1][x - 2].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x - 2, y: y + 1});
-				}
-			}
-		}
-	}
-	// King
-	else if (type == "k") {
-		// North-west, north and north-east
-		if (y != 0) {
-			// North-west
-			if (x != 0) {
-				// Move
-				if (board[y - 1][x - 1] == "") {
-					pseudoMoves.push({isCapture: false, x: x - 1, y: y - 1});
-				}
-				// Capture
-				else if (board[y - 1][x - 1].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x - 1, y: y - 1});
-				}
-			}
-			// North, Move
-			if (board[y - 1][x] == "") {
-				pseudoMoves.push({isCapture: false, x: x, y: y - 1});
-			}
-			// North, Capture
-			else if (board[y - 1][x].charAt(0) == opponent) {
-				pseudoMoves.push({isCapture: true, x: x, y: y - 1});
-			}
-			// North-east
-			if (x != 7) {
-				// Move
-				if (board[y - 1][x + 1] == "") {
-					pseudoMoves.push({isCapture: false, x: x + 1, y: y - 1});
-				}
-				// Capture
-				else if (board[y - 1][x + 1].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x + 1, y: y - 1});
-				}
-			}
-		}
-		// East
-		if (x != 7) {
-			// Move
-			if (board[y][x + 1] == "") {
-				pseudoMoves.push({isCapture: false, x: x + 1, y: y});
-			}
-			// Capture
-			else if (board[y][x + 1].charAt(0) == opponent) {
-				pseudoMoves.push({isCapture: true, x: x + 1, y: y});
-			}
-		}
-		// South-east, south and south-west
-		if (y != 7) {
-			// South-east
-			if (x != 7) {
-				// Move
-				if (board[y + 1][x + 1] == "") {
-					pseudoMoves.push({isCapture: false, x: x + 1, y: y + 1});
-				}
-				// Capture
-				else if (board[y + 1][x + 1].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x + 1, y: y + 1});
-				}
-			}
-			// South, Move
-			if (board[y + 1][x] == "") {
-				pseudoMoves.push({isCapture: false, x: x, y: y + 1});
-			}
-			// South, Capture
-			else if (board[y + 1][x].charAt(0) == opponent) {
-				pseudoMoves.push({isCapture: true, x: x, y: y + 1});
-			}
-			// South-west
-			if (x != 0) {
-				// Move
-				if (board[y + 1][x - 1] == "") {
-					pseudoMoves.push({isCapture: false, x: x - 1, y: y + 1});
-				}
-				// Capture
-				else if (board[y + 1][x - 1].charAt(0) == opponent) {
-					pseudoMoves.push({isCapture: true, x: x - 1, y: y + 1});
-				}
-			}
-		}
-		// West
-		if (x != 0) {
-			// Move
-			if (board[y][x - 1] == "") {
-				pseudoMoves.push({isCapture: false, x: x - 1, y: y});
-			}
-			// Capture
-			else if (board[y][x - 1].charAt(0) == opponent) {
-				pseudoMoves.push({isCapture: true, x: x - 1, y: y});
-			}
+			pseudoMoves = getKingMoves(opponent, x, y);
 		}
 	}
 	return pseudoMoves;
