@@ -1,27 +1,67 @@
-const FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
 const BOARD = document.getElementById("board");
 const FEN_INPUT = document.getElementById("fen");
 
-var activeColour = "w";
+// Reference game: https://lichess.org/vg8ou0o1#41
+
+var activeColour = "b";
 var board = [
-	["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"],
-	["", "bp", "bp", "bp", "", "bp", "bp", "bp"],
-	["", "", "wp", "wp", "bp", "", "", ""],
-	["bp", "", "", "", "", "", "wq", ""],
-	["", "wk", "wn", "", "wr", "wb", "", ""],
-	["", "", "bp", "", "", "", "", ""],
-	["wp", "wp", "wp", "", "wp", "wp", "wp", ""],
-	["wr", "wn", "wb", "wq", "wk", "", "wn", "wr"]
+	["", "", "wr", "", "bk", "", "", "br"],
+	["", "", "bn", "", "", "", "bp", "bp"],
+	["", "", "", "bb", "bp", "bp", "", ""],
+	["wb", "", "", "", "", "", "", "bq"],
+	["", "", "wp", "wp", "", "wp", "", ""],
+	["", "", "", "", "", "", "wp", ""],
+	["", "wq", "", "", "", "", "", "wp"],
+	["", "wn", "", "", "wk", "wb", "wn", "wr"]
 ];
+var moveCount = 21;
+
 var selectedPos = {x: -1, y: -1};
-var lastMovePos = {x: 3, y: 7};
-var lastMoveDestPos = {x: 5, y: 6};
-var checkPos = {x: 4, y: 7};
+var lastMovePos = {x: 1, y: 0};
+var lastMoveDestPos = {x: 2, y: 0};
+var checkPos = {x: 4, y: 0};
 var moves = [];
 
-FEN_INPUT.value = FEN;
 drawBoard();
+
+function getFen() {
+	let fen = "";
+	let y = 0;
+	for (row of board) {
+		let emptyCount = 0;
+		for (piece of row) {
+			if (piece == "") {
+				emptyCount += 1;
+			}
+			else {
+				if (emptyCount > 0) {
+					fen += emptyCount;
+					emptyCount = 0;
+				}
+				let p = piece.charAt(1);
+				if (piece.charAt(0) == "w") {
+					fen += p.toUpperCase();
+				}
+				else {
+					fen += p;
+				}
+			}
+		}
+		if (y < 7) {
+			fen += "/";
+			y += 1;
+		}
+	}
+	fen += " " + activeColour + " KQkq - 0 " + moveCount;
+	return fen;
+}
+
+function getOpponent(colour) {
+	if (colour == "w") {
+		return "b";
+	}
+	return "w";
+}
 
 function pieceClicked(piece) {
 	let classes = piece.classList;
@@ -38,7 +78,24 @@ function pieceClicked(piece) {
 		else {
 			let type = classes.item(1).charAt(1);
 			selectedPos = {x: x, y: y};
-			moves = getPseudoMoves(type, colour, x, y);
+			if (type == "p") {
+				moves = getPawnMoves(colour, x, y);
+			}
+			else if (type == "n") {
+				moves = getKnightMoves(colour, x, y);
+			}
+			else if (type == "b") {
+				moves = getBishopMoves(colour, x, y);
+			}
+			else if (type == "r") {
+				moves = getRookMoves(colour, x, y);
+			}
+			else if (type == "q") {
+				moves = getBishopMoves(colour, x, y).concat(getRookMoves(colour, x, y));
+			}
+			else {
+				moves = getKingMoves(colour, x, y);
+			}
 		}
 		drawBoard();
 	}
@@ -111,8 +168,9 @@ function getPawnMoves(colour, x, y) {
 	return m;
 }
 
-function getKnightMoves(opponent, x, y) {
+function getKnightMoves(colour, x, y) {
 	let m = [];
+	let opponent = getOpponent(colour);
 	// Top-left and top-right
 	if (y > 1) {
 		// Top-left
@@ -216,8 +274,9 @@ function getKnightMoves(opponent, x, y) {
 	return m;
 }
 
-function getBishopMoves(opponent, x, y) {
+function getBishopMoves(colour, x, y) {
 	let m = [];
+	let opponent = getOpponent(colour);
 	// North-east
 	for (let i = 1; i < 8; i ++) {
 		if (x + i < 8 && y - i > -1) {
@@ -301,8 +360,9 @@ function getBishopMoves(opponent, x, y) {
 	return m;
 }
 
-function getRookMoves(opponent, x, y) {
+function getRookMoves(colour, x, y) {
 	let m = [];
+	let opponent = getOpponent(colour);
 	// North
 	for (let i = 1; i < 8; i++) {
 		if (y - i > -1) {
@@ -386,8 +446,9 @@ function getRookMoves(opponent, x, y) {
 	return m;
 }
 
-function getKingMoves(opponent, x, y) {
+function getKingMoves(colour, x, y) {
 	let m = [];
+	let opponent = getOpponent(colour);
 	// North-west, north and north-east
 	if (y != 0) {
 		// North-west
@@ -479,45 +540,11 @@ function getKingMoves(opponent, x, y) {
 	return m;
 }
 
-function getPseudoMoves(type, colour, x, y) {
-	// TODO: Promotion, en passant
-	let pseudoMoves = [];
-	// Pawn
-	if (type == "p") {
-		pseudoMoves = getPawnMoves(colour, x, y);
-	}
-	else {
-		let opponent = "b";
-		if (activeColour == "b") {
-			opponent = "w";
-		}
-		// Knight
-		else if (type == "n") {
-			pseudoMoves = getKnightMoves(opponent, x, y);
-		}
-		// Bishop
-		else if (type == "b") {
-			pseudoMoves = getBishopMoves(opponent, x, y);
-		}
-		// Rook
-		else if (type == "r") {
-			pseudoMoves = getRookMoves(opponent, x, y);
-		}
-		// Queen
-		else if (type == "q") {
-			pseudoMoves = getBishopMoves(opponent, x, y).concat(getRookMoves(opponent, x, y));
-		}
-		// King
-		else {
-			pseudoMoves = getKingMoves(opponent, x, y);
-		}
-	}
-	return pseudoMoves;
-}
-
 function drawBoard() {
 	// Clear board
 	BOARD.innerHTML = "";
+	// Update FEN
+	FEN_INPUT.value = getFen();
 	// Draw selected
 	if (selectedPos.x != -1) {
 		let s = document.createElement("div");
