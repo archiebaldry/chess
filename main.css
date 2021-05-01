@@ -1,7 +1,15 @@
+#move-count {
+    float: right;
+}
 body {
     background-color: #252525;
     font-family: "Noto Sans", sans-serif;
     margin: 8px;
+}
+div.banner {
+    background-color: darkgreen;
+    color: #fff;
+    padding: 8px;
 }
 div.container {
     background-color: purple;

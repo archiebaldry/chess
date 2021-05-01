@@ -1,5 +1,7 @@
+const ACTIVE_COLOUR = document.getElementById("active-colour");
 const BOARD = document.getElementById("board");
 const FEN_INPUT = document.getElementById("fen");
+const MOVE_COUNT = document.getElementById("move-count");
 
 // Reference game: https://lichess.org/vg8ou0o1#41
 
@@ -543,6 +545,14 @@ function getKingMoves(colour, x, y) {
 function drawBoard() {
 	// Clear board
 	BOARD.innerHTML = "";
+	// Update banner
+	if (activeColour == "w") {
+		ACTIVE_COLOUR.innerHTML = "Waiting for white";
+	}
+	else {
+		ACTIVE_COLOUR.innerHTML = "Waiting for black";
+	}
+	MOVE_COUNT.innerHTML = moveCount;
 	// Update FEN
 	FEN_INPUT.value = getFen();
 	// Draw selected
