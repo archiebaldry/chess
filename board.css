@@ -1,33 +1,43 @@
 #board {
     background-image: url("assets/board.svg");
-    cursor: pointer;
     height: 100%;
+    pointer-events: none;
     position: relative;
     width: 100%;
 }
-#board>* {
-	height: 12.5%;
+#board>*>* {
+    background-size: cover;
+    height: 12.5%;
     position: absolute;
     width: 12.5%;
 }
-div.capture {
-	background-image: url("assets/capture.svg");
-	background-size: cover;
+#moves {
+    height: 100%;
+    position: absolute;
+    width: 100%;
 }
-div.check {
+#moves>*, .clickable {
+    cursor: pointer;
+    pointer-events: auto;
+}
+#pieces {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+}
+.capture {
+	background-image: url("assets/capture.svg");
+}
+.check {
     background-image: radial-gradient(#e60000 25%, rgba(0, 0, 0, 0) 90%);
     /* filter: drop-shadow(0 0 12.5px red); */
 }
-div.last-move {
+.last-move {
     background-color: rgba(155, 200, 0, 0.4);
 }
-div.move {
+.move {
 	background-image: url("assets/move.svg");
-	background-size: cover;
 }
-div.piece {
-    background-size: cover;
-}
-div.selected {
+.selected {
     background-color: rgba(20, 85, 30, 0.5);
 }

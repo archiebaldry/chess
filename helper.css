@@ -1,84 +1,79 @@
-div.bp {
-    background-image: url("pieces/bp.svg");
-}
-div.bn {
-    background-image: url("pieces/bn.svg");
-}
-div.bb {
-    background-image: url("pieces/bb.svg");
-}
-div.br {
-    background-image: url("pieces/br.svg");
-}
-div.bq {
-    background-image: url("pieces/bq.svg");
-}
-div.bk {
-    background-image: url("pieces/bk.svg");
-}
-div.wp {
-    background-image: url("pieces/wp.svg");
-}
-div.wn {
-    background-image: url("pieces/wn.svg");
-}
-div.wb {
-    background-image: url("pieces/wb.svg");
-}
-div.wr {
-    background-image: url("pieces/wr.svg");
-}
-div.wq {
-    background-image: url("pieces/wq.svg");
-}
-div.wk {
-    background-image: url("pieces/wk.svg");
-}
-div.x0 {
-    left: 0;
-}
-div.x1 {
-    left: 12.5%;
-}
-div.x2 {
-    left: 25%;
-}
-div.x3 {
-    left: 37.5%;
-}
-div.x4 {
-    left: 50%;
-}
-div.x5 {
-    left: 62.5%;
-}
-div.x6 {
-    left: 75%;
-}
-div.x7 {
-    left: 87.5%;
-}
-div.y0 {
-    top: 0;
-}
-div.y1 {
-    top: 12.5%;
-}
-div.y2 {
-    top: 25%;
-}
-div.y3 {
-    top: 37.5%;
-}
-div.y4 {
-    top: 50%;
-}
-div.y5 {
-    top: 62.5%;
-}
-div.y6 {
-    top: 75%;
-}
-div.y7 {
-    top: 87.5%;
-}
+/* Pieces */
+.bp {background-image: url("pieces/bp.svg");}
+.bn {background-image: url("pieces/bn.svg");}
+.bb {background-image: url("pieces/bb.svg");}
+.br {background-image: url("pieces/br.svg");}
+.bq {background-image: url("pieces/bq.svg");}
+.bk {background-image: url("pieces/bk.svg");}
+.wp {background-image: url("pieces/wp.svg");}
+.wn {background-image: url("pieces/wn.svg");}
+.wb {background-image: url("pieces/wb.svg");}
+.wr {background-image: url("pieces/wr.svg");}
+.wq {background-image: url("pieces/wq.svg");}
+.wk {background-image: url("pieces/wk.svg");}
+
+/* Squares */
+.a8 {left: 0; top: 0;}
+.b8 {left: 12.5%; top: 0;}
+.c8 {left: 25%; top: 0;}
+.d8 {left: 37.5%; top: 0;}
+.e8 {left: 50%; top: 0;}
+.f8 {left: 62.5%; top: 0;}
+.g8 {left: 75%; top: 0;}
+.h8 {left: 87.5%; top: 0;}
+.a7 {left: 0; top: 12.5%;}
+.b7 {left: 12.5%; top: 12.5%;}
+.c7 {left: 25%; top: 12.5%;}
+.d7 {left: 37.5%; top: 12.5%;}
+.e7 {left: 50%; top: 12.5%;}
+.f7 {left: 62.5%; top: 12.5%;}
+.g7 {left: 75%; top: 12.5%;}
+.h7 {left: 87.5%; top: 12.5%;}
+.a6 {left: 0; top: 25%;}
+.b6 {left: 12.5%; top: 25%;}
+.c6 {left: 25%; top: 25%;}
+.d6 {left: 37.5%; top: 25%;}
+.e6 {left: 50%; top: 25%;}
+.f6 {left: 62.5%; top: 25%;}
+.g6 {left: 75%; top: 25%;}
+.h6 {left: 87.5%; top: 25%;}
+.a5 {left: 0; top: 37.5%;}
+.b5 {left: 12.5%; top: 37.5%;}
+.c5 {left: 25%; top: 37.5%;}
+.d5 {left: 37.5%; top: 37.5%;}
+.e5 {left: 50%; top: 37.5%;}
+.f5 {left: 62.5%; top: 37.5%;}
+.g5 {left: 75%; top: 37.5%;}
+.h5 {left: 87.5%; top: 37.5%;}
+.a4 {left: 0; top: 50%;}
+.b4 {left: 12.5%; top: 50%;}
+.c4 {left: 25%; top: 50%;}
+.d4 {left: 37.5%; top: 50%;}
+.e4 {left: 50%; top: 50%;}
+.f4 {left: 62.5%; top: 50%;}
+.g4 {left: 75%; top: 50%;}
+.h4 {left: 87.5%; top: 50%;}
+.a3 {left: 0; top: 62.5%;}
+.b3 {left: 12.5%; top: 62.5%;}
+.c3 {left: 25%; top: 62.5%;}
+.d3 {left: 37.5%; top: 62.5%;}
+.e3 {left: 50%; top: 62.5%;}
+.f3 {left: 62.5%; top: 62.5%;}
+.g3 {left: 75%; top: 62.5%;}
+.h3 {left: 87.5%; top: 62.5%;}
+.a2 {left: 0; top: 75%;}
+.b2 {left: 12.5%; top: 75%;}
+.c2 {left: 25%; top: 75%;}
+.d2 {left: 37.5%; top: 75%;}
+.e2 {left: 50%; top: 75%;}
+.f2 {left: 62.5%; top: 75%;}
+.g2 {left: 75%; top: 75%;}
+.h2 {left: 87.5%; top: 75%;}
+.a1 {left: 0; top: 87.5%;}
+.b1 {left: 12.5%; top: 87.5%;}
+.c1 {left: 25%; top: 87.5%;}
+.d1 {left: 37.5%; top: 87.5%;}
+.e1 {left: 50%; top: 87.5%;}
+.f1 {left: 62.5%; top: 87.5%;}
+.g1 {left: 75%; top: 87.5%;}
+.h1 {left: 87.5%; top: 87.5%;}

@@ -1,3 +1,13 @@
+#banner {
+    background-color: darkgreen;
+    color: #fff;
+    padding: 8px;
+}
+#container {
+    height: 80vmin;
+    margin: 0 auto;
+    width: 80vmin;
+}
 #move-count {
     float: right;
 }
@@ -5,17 +15,6 @@ body {
     background-color: #252525;
     font-family: "Noto Sans", sans-serif;
     margin: 8px;
-}
-div.banner {
-    background-color: darkgreen;
-    color: #fff;
-    padding: 8px;
-}
-div.container {
-    background-color: purple;
-    height: 80vmin;
-    margin: 0 auto;
-    width: 80vmin;
 }
 input[type=text] {
     background-color: #252520;
