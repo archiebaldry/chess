@@ -65,6 +65,49 @@ function getOpponent(colour) {
 	return "w";
 }
 
+function isLegalMove(colour, oldX, oldY, newX, newY) {
+	let opponent = getOpponent(colour);
+	let tempBoard = board;
+	tempBoard[newY][newX] = tempBoard[oldY][oldX];
+	tempBoard[oldY][oldX] = "";
+	let y = 0;
+	for (row of board) {
+		let x = 0;
+		for (piece of row) {
+			if (piece.charAt(0) == opponent) {
+				let m = [];
+				let type = piece.charAt(1);
+				if (type == "p") {
+					m = getPawnMoves(opponent, x, y, tempBoard);
+				}
+				else if (type == "n") {
+					m = getKnightMoves(opponent, x, y, tempBoard);
+				}
+				else if (type == "b") {
+					m = getBishopMoves(opponent, x, y, tempBoard);
+				}
+				else if (type == "r") {
+					m = getRookMoves(opponent, x, y, tempBoard);
+				}
+				else if (type == "q") {
+					m = getBishopMoves(opponent, x, y, tempBoard).concat(getRookMoves(opponent, x, y, tempBoard));
+				}
+				else {
+					m = getKingMoves(opponent, x, y, tempBoard);
+				}
+				for (move of m) {
+					if (tempBoard[move.y][move.x] == colour + "k") {
+						return false;
+					}
+				}
+			}
+			x += 1;
+		}
+		y += 1;
+	}
+	return true;
+}
+
 function pieceClicked(piece) {
 	let classes = piece.classList;
 	let colour = classes.item(1).charAt(0);
@@ -78,25 +121,32 @@ function pieceClicked(piece) {
 		}
 		// Select piece, calculate moves
 		else {
+			let pseudoMoves = [];
 			let type = classes.item(1).charAt(1);
 			selectedPos = {x: x, y: y};
 			if (type == "p") {
-				moves = getPawnMoves(colour, x, y);
+				pseudoMoves = getPawnMoves(colour, x, y);
 			}
 			else if (type == "n") {
-				moves = getKnightMoves(colour, x, y);
+				pseudoMoves = getKnightMoves(colour, x, y);
 			}
 			else if (type == "b") {
-				moves = getBishopMoves(colour, x, y);
+				pseudoMoves = getBishopMoves(colour, x, y);
 			}
 			else if (type == "r") {
-				moves = getRookMoves(colour, x, y);
+				pseudoMoves = getRookMoves(colour, x, y);
 			}
 			else if (type == "q") {
-				moves = getBishopMoves(colour, x, y).concat(getRookMoves(colour, x, y));
+				pseudoMoves = getBishopMoves(colour, x, y).concat(getRookMoves(colour, x, y));
 			}
 			else {
-				moves = getKingMoves(colour, x, y);
+				pseudoMoves = getKingMoves(colour, x, y);
+			}
+			moves = [];
+			for (move of pseudoMoves) {
+				if (isLegalMove(getOpponent(colour), x, y, move.x, move.y)) {
+					moves.push(move);
+				}
 			}
 		}
 		drawBoard();
@@ -119,7 +169,7 @@ function captureClicked(capture) {
 	let y = parseInt(classes.item(2).charAt(1));
 }
 
-function getPawnMoves(colour, x, y) {
+function getPawnMoves(colour, x, y, b = board) {
 	let m = [];
 	// White
 	if (colour == "w") {
@@ -128,19 +178,19 @@ function getPawnMoves(colour, x, y) {
 			return m;
 		}
 		// Push
-		if (board[y - 1][x] == "") {
+		if (b[y - 1][x] == "") {
 			m.push({isCapture: false, x: x, y: y - 1});
 		}
 		// Double push
-		if (y == 6 && board[y - 1][x] == "" && board[y - 2][x] == "") {
+		if (y == 6 && b[y - 1][x] == "" && b[y - 2][x] == "") {
 			m.push({isCapture: false, x: x, y: y - 2});
 		}
 		// Left
-		if (x != 0 && board[y - 1][x - 1].charAt(0) == "b") {
+		if (x != 0 && b[y - 1][x - 1].charAt(0) == "b") {
 			m.push({isCapture: true, x: x - 1, y: y - 1});
 		}
 		// Right
-		if (x != 7 && board[y - 1][x + 1].charAt(0) == "b") {
+		if (x != 7 && b[y - 1][x + 1].charAt(0) == "b") {
 			m.push({isCapture: true, x: x + 1, y: y - 1});
 		}
 	}
@@ -151,26 +201,26 @@ function getPawnMoves(colour, x, y) {
 			return m;
 		}
 		// Push
-		if (board[y + 1][x] == "") {
+		if (b[y + 1][x] == "") {
 			m.push({isCapture: false, x: x, y: y + 1});
 		}
 		// Double push
-		if (y == 1 && board[y + 1][x] == "" && board[y + 2][x] == "") {
+		if (y == 1 && b[y + 1][x] == "" && b[y + 2][x] == "") {
 			m.push({isCapture: false, x: x, y: y + 2});
 		}
 		// Left (black perspective)
-		if (x != 7 && board[y + 1][x + 1].charAt(0) == "w") {
+		if (x != 7 && b[y + 1][x + 1].charAt(0) == "w") {
 			m.push({isCapture: true, x: x + 1, y: y + 1});
 		}
 		// Right (black perspective)
-		if (x != 0 && board[y + 1][x - 1].charAt(0) == "w") {
+		if (x != 0 && b[y + 1][x - 1].charAt(0) == "w") {
 			m.push({isCapture: true, x: x - 1, y: y + 1});
 		}
 	}
 	return m;
 }
 
-function getKnightMoves(colour, x, y) {
+function getKnightMoves(colour, x, y, b = board) {
 	let m = [];
 	let opponent = getOpponent(colour);
 	// Top-left and top-right
@@ -178,22 +228,22 @@ function getKnightMoves(colour, x, y) {
 		// Top-left
 		if (x != 0) {
 			// Move
-			if (board[y - 2][x - 1] == "") {
+			if (b[y - 2][x - 1] == "") {
 				m.push({isCapture: false, x: x - 1, y: y - 2});
 			}
 			// Capture
-			else if (board[y - 2][x - 1].charAt(0) == opponent) {
+			else if (b[y - 2][x - 1].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x - 1, y: y - 2});
 			}
 		}
 		// Top-right
 		if (x != 7) {
 			// Move
-			if (board[y - 2][x + 1] == "") {
+			if (b[y - 2][x + 1] == "") {
 				m.push({isCapture: false, x: x + 1, y: y - 2});
 			}
 			// Capture
-			else if (board[y - 2][x + 1].charAt(0) == opponent) {
+			else if (b[y - 2][x + 1].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x + 1, y: y - 2});
 			}
 		}
@@ -203,22 +253,22 @@ function getKnightMoves(colour, x, y) {
 		// Upper-right
 		if (y != 0) {
 			// Move
-			if (board[y - 1][x + 2] == "") {
+			if (b[y - 1][x + 2] == "") {
 				m.push({isCapture: false, x: x + 2, y: y - 1});
 			}
 			// Capture
-			else if (board[y - 1][x + 2].charAt(0) == opponent) {
+			else if (b[y - 1][x + 2].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x + 2, y: y - 1});
 			}
 		}
 		// Lower-right
 		if (y != 7) {
 			// Move
-			if (board[y + 1][x + 2] == "") {
+			if (b[y + 1][x + 2] == "") {
 				m.push({isCapture: false, x: x + 2, y: y + 1});
 			}
 			// Capture
-			else if (board[y + 1][x + 2].charAt(0) == opponent) {
+			else if (b[y + 1][x + 2].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x + 2, y: y + 1});
 			}
 		}
@@ -228,22 +278,22 @@ function getKnightMoves(colour, x, y) {
 		// Bottom-left
 		if (x != 0) {
 			// Move
-			if (board[y + 2][x - 1] == "") {
+			if (b[y + 2][x - 1] == "") {
 				m.push({isCapture: false, x: x - 1, y: y + 2});
 			}
 			// Capture
-			else if (board[y + 2][x - 1].charAt(0) == opponent) {
+			else if (b[y + 2][x - 1].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x - 1, y: y + 2});
 			}
 		}
 		// Bottom-right
 		if (x != 7) {
 			// Move
-			if (board[y + 2][x + 1] == "") {
+			if (b[y + 2][x + 1] == "") {
 				m.push({isCapture: false, x: x + 1, y: y + 2});
 			}
 			// Capture
-			else if (board[y + 2][x + 1].charAt(0) == opponent) {
+			else if (b[y + 2][x + 1].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x + 1, y: y + 2});
 			}
 		}
@@ -253,22 +303,22 @@ function getKnightMoves(colour, x, y) {
 		// Upper-left
 		if (y != 0) {
 			// Move
-			if (board[y - 1][x - 2] == "") {
+			if (b[y - 1][x - 2] == "") {
 				m.push({isCapture: false, x: x - 2, y: y - 1});
 			}
 			// Capture
-			else if (board[y - 1][x - 2].charAt(0) == opponent) {
+			else if (b[y - 1][x - 2].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x - 2, y: y - 1});
 			}
 		}
 		// Lower-left
 		if (y != 7) {
 			// Move
-			if (board[y + 1][x - 2] == "") {
+			if (b[y + 1][x - 2] == "") {
 				m.push({isCapture: false, x: x - 2, y: y + 1});
 			}
 			// Capture
-			else if (board[y + 1][x - 2].charAt(0) == opponent) {
+			else if (b[y + 1][x - 2].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x - 2, y: y + 1});
 			}
 		}
@@ -276,18 +326,18 @@ function getKnightMoves(colour, x, y) {
 	return m;
 }
 
-function getBishopMoves(colour, x, y) {
+function getBishopMoves(colour, x, y, b = board) {
 	let m = [];
 	let opponent = getOpponent(colour);
 	// North-east
 	for (let i = 1; i < 8; i ++) {
 		if (x + i < 8 && y - i > -1) {
 			// Move
-			if (board[y - i][x + i] == "") {
+			if (b[y - i][x + i] == "") {
 				m.push({isCapture: false, x: x + i, y: y - i});
 			}
 			// Capture
-			else if (board[y - i][x + i].charAt(0) == opponent) {
+			else if (b[y - i][x + i].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x + i, y: y - i});
 				break;
 			}
@@ -303,11 +353,11 @@ function getBishopMoves(colour, x, y) {
 	for (let i = 1; i < 8; i ++) {
 		if (x + i < 8 && y + i < 8) {
 			// Move
-			if (board[y + i][x + i] == "") {
+			if (b[y + i][x + i] == "") {
 				m.push({isCapture: false, x: x + i, y: y + i});
 			}
 			// Capture
-			else if (board[y + i][x + i].charAt(0) == opponent) {
+			else if (b[y + i][x + i].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x + i, y: y + i});
 				break;
 			}
@@ -323,11 +373,11 @@ function getBishopMoves(colour, x, y) {
 	for (let i = 1; i < 8; i ++) {
 		if (x - i > -1 && y + i < 8) {
 			// Move
-			if (board[y + i][x - i] == "") {
+			if (b[y + i][x - i] == "") {
 				m.push({isCapture: false, x: x - i, y: y + i});
 			}
 			// Capture
-			else if (board[y + i][x - i].charAt(0) == opponent) {
+			else if (b[y + i][x - i].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x - i, y: y + i});
 				break;
 			}
@@ -343,11 +393,11 @@ function getBishopMoves(colour, x, y) {
 	for (let i = 1; i < 8; i ++) {
 		if (x - i > -1 && y - i > -1) {
 			// Move
-			if (board[y - i][x - i] == "") {
+			if (b[y - i][x - i] == "") {
 				m.push({isCapture: false, x: x - i, y: y - i});
 			}
 			// Capture
-			else if (board[y - i][x - i].charAt(0) == opponent) {
+			else if (b[y - i][x - i].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x - i, y: y - i});
 				break;
 			}
@@ -362,18 +412,18 @@ function getBishopMoves(colour, x, y) {
 	return m;
 }
 
-function getRookMoves(colour, x, y) {
+function getRookMoves(colour, x, y, b = board) {
 	let m = [];
 	let opponent = getOpponent(colour);
 	// North
 	for (let i = 1; i < 8; i++) {
 		if (y - i > -1) {
 			// Move
-			if (board[y - i][x] == "") {
+			if (b[y - i][x] == "") {
 				m.push({isCapture: false, x: x, y: y - i});
 			}
 			// Capture
-			else if (board[y - i][x].charAt(0) == opponent) {
+			else if (b[y - i][x].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x, y: y - i});
 				break;
 			}
@@ -389,11 +439,11 @@ function getRookMoves(colour, x, y) {
 	for (let i = 1; i < 8; i++) {
 		if (x + i < 8) {
 			// Move
-			if (board[y][x + i] == "") {
+			if (b[y][x + i] == "") {
 				m.push({isCapture: false, x: x + i, y: y});
 			}
 			// Capture
-			else if (board[y][x + i].charAt(0) == opponent) {
+			else if (b[y][x + i].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x + i, y: y});
 				break;
 			}
@@ -409,11 +459,11 @@ function getRookMoves(colour, x, y) {
 	for (let i = 1; i < 8; i++) {
 		if (y + i < 8) {
 			// Move
-			if (board[y + i][x] == "") {
+			if (b[y + i][x] == "") {
 				m.push({isCapture: false, x: x, y: y + i});
 			}
 			// Capture
-			else if (board[y + i][x].charAt(0) == opponent) {
+			else if (b[y + i][x].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x, y: y + i});
 				break;
 			}
@@ -429,11 +479,11 @@ function getRookMoves(colour, x, y) {
 	for (let i = 1; i < 8; i++) {
 		if (x - i > -1) {
 			// Move
-			if (board[y][x - i] == "") {
+			if (b[y][x - i] == "") {
 				m.push({isCapture: false, x: x - i, y: y});
 			}
 			// Capture
-			else if (board[y][x - i].charAt(0) == opponent) {
+			else if (b[y][x - i].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x - i, y: y});
 				break;
 			}
@@ -448,7 +498,7 @@ function getRookMoves(colour, x, y) {
 	return m;
 }
 
-function getKingMoves(colour, x, y) {
+function getKingMoves(colour, x, y, b = board) {
 	let m = [];
 	let opponent = getOpponent(colour);
 	// North-west, north and north-east
@@ -456,30 +506,30 @@ function getKingMoves(colour, x, y) {
 		// North-west
 		if (x != 0) {
 			// Move
-			if (board[y - 1][x - 1] == "") {
+			if (b[y - 1][x - 1] == "") {
 				m.push({isCapture: false, x: x - 1, y: y - 1});
 			}
 			// Capture
-			else if (board[y - 1][x - 1].charAt(0) == opponent) {
+			else if (b[y - 1][x - 1].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x - 1, y: y - 1});
 			}
 		}
 		// North, Move
-		if (board[y - 1][x] == "") {
+		if (b[y - 1][x] == "") {
 			m.push({isCapture: false, x: x, y: y - 1});
 		}
 		// North, Capture
-		else if (board[y - 1][x].charAt(0) == opponent) {
+		else if (b[y - 1][x].charAt(0) == opponent) {
 			m.push({isCapture: true, x: x, y: y - 1});
 		}
 		// North-east
 		if (x != 7) {
 			// Move
-			if (board[y - 1][x + 1] == "") {
+			if (b[y - 1][x + 1] == "") {
 				m.push({isCapture: false, x: x + 1, y: y - 1});
 			}
 			// Capture
-			else if (board[y - 1][x + 1].charAt(0) == opponent) {
+			else if (b[y - 1][x + 1].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x + 1, y: y - 1});
 			}
 		}
@@ -487,11 +537,11 @@ function getKingMoves(colour, x, y) {
 	// East
 	if (x != 7) {
 		// Move
-		if (board[y][x + 1] == "") {
+		if (b[y][x + 1] == "") {
 			m.push({isCapture: false, x: x + 1, y: y});
 		}
 		// Capture
-		else if (board[y][x + 1].charAt(0) == opponent) {
+		else if (b[y][x + 1].charAt(0) == opponent) {
 			m.push({isCapture: true, x: x + 1, y: y});
 		}
 	}
@@ -500,30 +550,30 @@ function getKingMoves(colour, x, y) {
 		// South-east
 		if (x != 7) {
 			// Move
-			if (board[y + 1][x + 1] == "") {
+			if (b[y + 1][x + 1] == "") {
 				m.push({isCapture: false, x: x + 1, y: y + 1});
 			}
 			// Capture
-			else if (board[y + 1][x + 1].charAt(0) == opponent) {
+			else if (b[y + 1][x + 1].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x + 1, y: y + 1});
 			}
 		}
 		// South, Move
-		if (board[y + 1][x] == "") {
+		if (b[y + 1][x] == "") {
 			m.push({isCapture: false, x: x, y: y + 1});
 		}
 		// South, Capture
-		else if (board[y + 1][x].charAt(0) == opponent) {
+		else if (b[y + 1][x].charAt(0) == opponent) {
 			m.push({isCapture: true, x: x, y: y + 1});
 		}
 		// South-west
 		if (x != 0) {
 			// Move
-			if (board[y + 1][x - 1] == "") {
+			if (b[y + 1][x - 1] == "") {
 				m.push({isCapture: false, x: x - 1, y: y + 1});
 			}
 			// Capture
-			else if (board[y + 1][x - 1].charAt(0) == opponent) {
+			else if (b[y + 1][x - 1].charAt(0) == opponent) {
 				m.push({isCapture: true, x: x - 1, y: y + 1});
 			}
 		}
@@ -531,11 +581,11 @@ function getKingMoves(colour, x, y) {
 	// West
 	if (x != 0) {
 		// Move
-		if (board[y][x - 1] == "") {
+		if (b[y][x - 1] == "") {
 			m.push({isCapture: false, x: x - 1, y: y});
 		}
 		// Capture
-		else if (board[y][x - 1].charAt(0) == opponent) {
+		else if (b[y][x - 1].charAt(0) == opponent) {
 			m.push({isCapture: true, x: x - 1, y: y});
 		}
 	}
