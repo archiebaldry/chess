@@ -1779,6 +1779,10 @@ var Chess = function (fen) {
       return turn
     },
 
+    move_number: function () {
+      return move_number
+    },
+
     move: function (move, options) {
       /* The move function can be called with in the following parameters:
        *

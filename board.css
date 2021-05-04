@@ -11,7 +11,7 @@
     position: absolute;
     width: 12.5%;
 }
-#moves {
+#moves, #pieces, #special {
     height: 100%;
     position: absolute;
     width: 100%;
@@ -20,19 +20,15 @@
     cursor: pointer;
     pointer-events: auto;
 }
-#pieces {
-    height: 100%;
-    position: absolute;
-    width: 100%;
-}
+
+/* Special */
 #selected {
     background-color: rgba(20, 85, 30, 0.5);
 }
 .check {
     background-image: radial-gradient(#e60000 25%, rgba(0, 0, 0, 0) 90%);
-    /* filter: drop-shadow(0 0 12.5px red); */
 }
-.last-move {
+.last {
     background-color: rgba(155, 200, 0, 0.4);
 }
 
