@@ -4,6 +4,7 @@ const FEN_INPUT = document.getElementById("fen");
 const MOVE_COUNT = document.getElementById("move-count");
 
 // Reference game: https://lichess.org/vg8ou0o1#41
+// 2R1k2r/2n3pp/3bpp2/B6q/2PP1P2/6P1/1Q5P/1N2KBNR b Kk - 0 21
 
 var activeColour = "b";
 var board = [

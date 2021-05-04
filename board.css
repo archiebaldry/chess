@@ -16,7 +16,7 @@
     position: absolute;
     width: 100%;
 }
-#moves>*, .clickable {
+#moves>*, .active {
     cursor: pointer;
     pointer-events: auto;
 }
@@ -25,8 +25,8 @@
     position: absolute;
     width: 100%;
 }
-.capture {
-	background-image: url("assets/capture.svg");
+#selected {
+    background-color: rgba(20, 85, 30, 0.5);
 }
 .check {
     background-image: radial-gradient(#e60000 25%, rgba(0, 0, 0, 0) 90%);
@@ -35,9 +35,11 @@
 .last-move {
     background-color: rgba(155, 200, 0, 0.4);
 }
-.move {
+
+/* Moves */
+.n, .b, .p, .k, .q {
 	background-image: url("assets/move.svg");
 }
-.selected {
-    background-color: rgba(20, 85, 30, 0.5);
+.e, .c, .pc {
+	background-image: url("assets/capture.svg");
 }

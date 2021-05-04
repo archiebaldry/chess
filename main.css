@@ -21,8 +21,7 @@ input[type=text] {
     border: 1px solid #404040;
     box-sizing: border-box;
     color: #ccc;
-    height: 32px;
     margin-top: 8px;
-    padding: 1px 8px;
+    padding: 8px;
     width: 100%;
 }

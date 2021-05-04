@@ -17,7 +17,8 @@
 			<strong id="active-colour"></strong>
 			<strong id="move-count"></strong>
 		</div>
-		<input id="fen" type="text">
+		<input id="fen" type="text" oninput="tryFen(this.value);">
+		<textarea id="pgn" cols="40" rows="5"></textarea>
 	</div>
 	<script src="chess.js"></script>
 	<script src="test.js"></script>

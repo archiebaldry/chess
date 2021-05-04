@@ -1,3 +1,101 @@
+const MOVES = document.getElementById("moves");
+const PIECES = document.getElementById("pieces");
+
+const ACTIVE_COLOUR = document.getElementById("active-colour");
+const FEN_INPUT = document.getElementById("fen");
+const MOVE_COUNT = document.getElementById("move-count");
+const PGN_INPUT = document.getElementById("pgn");
+
+const chess = new Chess(
+"1Rb1k2r/2n3pp/3bpp2/B6q/2PP1P2/6P1/1Q5P/1N2KBNR w Kk - 0 21");
+
+var activeColour = "w";
+var selectedSquare;
+
+draw();
+
+function draw() {
+	// Clear moves, pieces and selected indicator
+	MOVES.innerHTML = "";
+	PIECES.innerHTML = "";
+	// Unset selected square
+	selectedSquare = null;
+    // Update active colour, move count, FEN and PGN
+    let records = chess.fen().split(" ");
+    activeColour = records[1];
+	if (activeColour == "w") {
+		ACTIVE_COLOUR.innerHTML = "White's move";
+	} else {
+		ACTIVE_COLOUR.innerHTML = "Black's move";
+	}
+	MOVE_COUNT.innerHTML = records[5];
+	FEN_INPUT.value = chess.fen();
+	PGN_INPUT.value = chess.pgn({newline_char: "/n"});
+	// Draw pieces
+	let y = 0;
+	for (row of chess.board()) {
+		let x = 0;
+		for (piece of row) {
+			if (piece != null) {
+				let p = document.createElement("div");
+				p.className = piece.color + piece.type + " " + toSquare(x, y);
+                if (piece.color == activeColour) {
+                    p.onclick = function() {pieceClicked(this);};
+                    p.className += " active";
+                }
+				PIECES.appendChild(p);
+			}
+			x += 1;
+		}
+		y += 1;
+	}
+}
+
+function moveClicked(move) {
+	let classes = move.classList;
+	if (classes.length == 2) {
+		chess.move(classes.item(1));
+	} else {
+		chess.move(classes.item(2));
+	}
+	draw();
+}
+
+function pieceClicked(piece) {
+    // Clear moves
+	MOVES.innerHTML = "";
+	// Clear selected indicator
+	let selected = document.getElementById("selected");
+	if (PIECES.contains(selected)) {
+		selected.remove();
+	}
+    let square = piece.classList.item(1);
+    if (square == selectedSquare) {
+		// Unset selected square
+        selectedSquare = null;
+    } else {
+		// Draw selected indicator
+		let s = document.createElement("div");
+		s.className = square;
+		s.id = "selected";
+		PIECES.insertBefore(s, PIECES.firstChild);
+		// Set selected square
+        selectedSquare = square;
+		// Draw moves
+        let moves = chess.moves({square: square, verbose: true});
+		for (move of moves) {
+            let m = document.createElement("div");
+			let cname = move.flags + " " + move.to;
+			if (move.san != move.to) {
+				cname += " " + move.san;
+			}
+			m.className = cname;
+			m.onclick = function() {moveClicked(this);};
+            MOVES.appendChild(m);
+        }
+    }
+}
+
 function toSquare(x, y) {
     let file;
     switch (x) {
@@ -26,107 +124,10 @@ function toSquare(x, y) {
     return file + rank;
 }
 
-function toX(square) {
-    switch (square.charAt(0)) {
-        case "a": return 0;
-        case "b": return 1;
-        case "c": return 2;
-        case "d": return 3;
-        case "e": return 4;
-        case "f": return 5;
-        case "g": return 6;
-        case "h": return 7;
-        default: return null;
-    }
-}
-
-function toY(square) {
-    switch (square.charAt(1)) {
-        case "8": return 0;
-        case "7": return 1;
-        case "6": return 2;
-        case "5": return 3;
-        case "4": return 4;
-        case "3": return 5;
-        case "2": return 6;
-        case "1": return 7;
-        default: return null;
-    }
-}
-
-const MOVES = document.getElementById("moves");
-const PIECES = document.getElementById("pieces");
-
-const ACTIVE_COLOUR = document.getElementById("active-colour");
-const FEN_INPUT = document.getElementById("fen");
-const MOVE_COUNT = document.getElementById("move-count");
-
-const chess = new Chess();
-
-var activeColour = "w";
-var selectedSquare;
-
-draw();
-
-function draw() {
-	// Clear pieces
-	PIECES.innerHTML = "";
-    // Update active colour, move count and FEN
-    let records = chess.fen().split(" ");
-    activeColour = records[1];
-	if (activeColour == "w") {
-		ACTIVE_COLOUR.innerHTML = "Waiting for white";
+function tryFen(fen) {
+	if (chess.load(fen)) {
+		draw();
 	}
-	else {
-		ACTIVE_COLOUR.innerHTML = "Waiting for black";
-	}
-	MOVE_COUNT.innerHTML = records[5];
-	FEN_INPUT.value = chess.fen();
-	// Draw pieces
-	let y = 0;
-	for (row of chess.board()) {
-		let x = 0;
-		for (piece of row) {
-			if (piece != null) {
-				let p = document.createElement("div");
-				p.className = piece.color + piece.type + " " + toSquare(x, y);
-                if (piece.color == activeColour) {
-                    p.onclick = function() {pieceClicked(this);};
-                    p.className += " clickable";
-                }
-				PIECES.appendChild(p);
-			}
-			x += 1;
-		}
-		y += 1;
-	}
-}
-
-function pieceClicked(piece) {
-    // Clear moves
-	MOVES.innerHTML = "";
-    // Draw moves (unless deselect)
-    let square = piece.classList.item(1);
-    if (square == selectedSquare) {
-        selectedSquare = null;
-    } else {
-        selectedSquare = square;
-        let moves = chess.moves({square: square, verbose: true});
-        console.log(square, moves);
-        for (move of moves) {
-            // What is SAN? Should it replace move.to?
-            let m = document.createElement("div");
-            if (move.flags.includes("c")) {
-                m.className = "capture " + move.to;
-                m.onclick = function() {captureClicked(this);};
-            }
-            else {
-                m.className = "move " + move.to;
-                m.onclick = function() {moveClicked(this);};
-            }
-            MOVES.appendChild(m)
-        }
-    }
 }
 
 // while (!chess.game_over()) {
