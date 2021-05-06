@@ -1,12 +1,23 @@
+.player>* {
+	display: inline;
+	vertical-align: middle;
+}
+.player>h2 {
+	color: white;
+}
+.player>img {
+	height: 24px;
+}
+.player>p {
+	color: darkgrey;
+}
 #banner {
     background-color: darkgreen;
-    color: #fff;
+	margin-top: 8px;
     padding: 8px;
 }
 #container {
-    height: 80vmin;
-    margin: 0 auto;
-    width: 80vmin;
+    margin: 8px 25%;
 }
 #move-count {
     float: right;
@@ -14,9 +25,9 @@
 body {
     background-color: #252525;
     font-family: "Noto Sans", sans-serif;
-    margin: 8px;
+    margin: 0;
 }
-input[type=text] {
+#fen {
     background-color: #252520;
     border: 1px solid #404040;
     box-sizing: border-box;
@@ -24,4 +35,7 @@ input[type=text] {
     margin-top: 8px;
     padding: 8px;
     width: 100%;
+}
+strong {
+	color: #fff;
 }

@@ -1,9 +1,9 @@
 #board {
     background-image: url("assets/board.svg");
-    height: 100%;
+	margin: 8px 0;
+	padding-bottom: 100%;
     pointer-events: none;
     position: relative;
-    width: 100%;
 }
 #board>*>* {
     background-size: cover;

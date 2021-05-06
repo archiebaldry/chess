@@ -1,3 +1,4 @@
+const BOARD = document.getElementById("board");
 const MOVES = document.getElementById("moves");
 const PIECES = document.getElementById("pieces");
 const SPECIAL = document.getElementById("special");
