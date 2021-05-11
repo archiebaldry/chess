@@ -1,23 +1,39 @@
+#container {
+    background-color: rgba(255, 0, 255, 0.5);
+    box-sizing: border-box;
+    height: 100vmin;
+    padding: 8px;
+    width: 100vmin;
+}
+#player {
+    height: 5%;
+}
+#board {
+    background-image: url("assets/board.svg");
+    pointer-events: none;
+    position: relative;
+
+    height: 90%;
+}
 .player>* {
 	display: inline;
 	vertical-align: middle;
 }
 .player>h2 {
 	color: white;
+    font-size: 100%;
 }
 .player>img {
-	height: 24px;
+	height: 100%;
 }
 .player>p {
 	color: darkgrey;
+    font-size: 100%;
 }
 #banner {
     background-color: darkgreen;
 	margin-top: 8px;
     padding: 8px;
-}
-#container {
-    margin: 8px 25%;
 }
 #move-count {
     float: right;
